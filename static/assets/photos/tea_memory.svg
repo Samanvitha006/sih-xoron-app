@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 350" width="100%" height="100%">
+  <defs>
+    <linearGradient id="tea_bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#BAE6FD"/>
+      <stop offset="60%" stop-color="#E0F2FE"/>
+      <stop offset="100%" stop-color="#A7F3D0"/>
+    </linearGradient>
+  </defs>
+  <rect width="500" height="350" rx="24" fill="url(#tea_bg)"/>
+  <!-- Distant Blue Himalayan Foothills -->
+  <path d="M 0 160 Q 120 100 250 140 Q 380 90 500 150 L 500 350 L 0 350 Z" fill="#6EE7B7"/>
+  <path d="M 0 180 Q 150 140 300 170 Q 420 130 500 190 L 500 350 L 0 350 Z" fill="#10B981"/>
+  <!-- Contoured Tea Bushes Rows -->
+  <path d="M -50 250 Q 100 210 250 240 Q 400 210 550 250 L 550 350 L -50 350 Z" fill="#047857"/>
+  <path d="M -50 290 Q 150 260 300 290 Q 450 260 550 300 L 550 350 L -50 350 Z" fill="#064E3B"/>
+  <!-- Tea Plucker Silhouette with Jaapi -->
+  <circle cx="360" cy="180" r="12" fill="#FEF08A"/>
+  <!-- Jaapi hat -->
+  <polygon points="335,180 360,165 385,180" fill="#CA8A04"/>
+  <polygon points="350,180 360,172 370,180" fill="#DC2626"/>
+  <!-- Basket on back -->
+  <rect x="370" y="185" width="20" height="30" rx="4" fill="#B45309"/>
+  <text x="250" y="335" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Tezpur Tea Garden & Cottage (1968)</text>
+</svg>

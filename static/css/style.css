@@ -1,0 +1,199 @@
+/* 
+ * XORON Dementia-Friendly Styling
+ * Warm, Soothing, High-Contrast Palette (Sage Green, Amber Gold, Earthy Terracotta)
+ * WCAG AAA Compliant Large Tap Targets (60px+) & No-Panic Animations
+ */
+
+:root {
+  --bg-warm: #FAF7F2;
+  --bg-card: #FFFFFF;
+  --amber-primary: #B45309;
+  --amber-light: #FEF3C7;
+  --amber-dark: #78350F;
+  --green-sage: #065F46;
+  --green-soft: #ECFDF5;
+  --border-subtle: #E5E7EB;
+  --text-main: #1F2937;
+  --text-muted: #4B5563;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-warm);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', 'Noto Sans Bengali', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
+}
+
+/* Warm Buttons with High Tactile Feel */
+.btn-warm {
+  background: linear-gradient(135deg, #D97706, #B45309);
+  color: #FFFFFF;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-warm:hover {
+  background: linear-gradient(135deg, #B45309, #92400E);
+  transform: translateY(-1px);
+}
+.btn-warm:active {
+  transform: scale(0.98);
+}
+
+.btn-voice-pill {
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-voice-pill:hover {
+  transform: scale(1.02);
+}
+
+/* Navigation Tabs */
+.nav-tab-btn {
+  padding: 10px 18px;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #6B7280;
+  background: transparent;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.nav-tab-btn:hover {
+  color: var(--amber-dark);
+  background: #F3F4F6;
+}
+.nav-tab-active {
+  background: var(--amber-light) !important;
+  color: var(--amber-dark) !important;
+  border-color: #FCD34D !important;
+}
+
+/* Language Selection Pills */
+.lang-pill {
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1.5px solid #D1D5DB;
+  background: #FFFFFF;
+  color: #4B5563;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.lang-pill:hover {
+  border-color: var(--amber-primary);
+  color: var(--amber-dark);
+}
+.active-lang {
+  background: #B45309 !important;
+  color: #FFFFFF !important;
+  border-color: #B45309 !important;
+  box-shadow: 0 2px 6px rgba(180, 83, 9, 0.3);
+}
+
+/* Errorless Learning Gentle Cue Pulse (Zero Panic) */
+@keyframes gentlePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.7);
+    border-color: #D97706;
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(217, 119, 6, 0);
+    border-color: #F59E0B;
+    transform: scale(1.02);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(217, 119, 6, 0);
+    border-color: #D97706;
+    transform: scale(1);
+  }
+}
+
+.cue-pulse-target {
+  animation: gentlePulse 2s infinite ease-in-out !important;
+  border-width: 3px !important;
+  border-color: #D97706 !important;
+  background-color: #FFFBEB !important;
+}
+
+/* Voice Input Mic Pulse Wave */
+@keyframes micWave {
+  0% {
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(225, 29, 72, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0);
+  }
+}
+.mic-active-pulse {
+  animation: micWave 1.4s infinite ease-out;
+  background-color: #E11D48 !important;
+  color: #FFFFFF !important;
+}
+
+/* Dementia Large Touch Targets */
+.large-touch-target {
+  min-height: 64px;
+  min-width: 64px;
+}
+
+/* Smooth Card Hover */
+.family-card, .story-card, .game-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.family-card:hover, .game-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F1EFE9;
+}
+::-webkit-scrollbar-thumb {
+  background: #D1C7B7;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B4A694;
+}
+
+/* Smartphone Bezel Simulator Mode */
+.mobile-bezel-frame {
+  max-width: 440px !important;
+  margin: 20px auto !important;
+  border: 12px solid #1F2937 !important;
+  border-radius: 48px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px #374151 !important;
+  position: relative !important;
+  overflow: hidden !important;
+  background-color: #FAF7F2 !important;
+  padding: 16px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.mobile-bezel-frame::before {
+  content: "";
+  display: block;
+  width: 90px;
+  height: 5px;
+  background: #374151;
+  border-radius: 9999px;
+  margin: 0 auto 16px auto;
+}

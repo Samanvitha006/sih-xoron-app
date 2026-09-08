@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <rect width="200" height="200" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+  <!-- Red woven floral border -->
+  <rect x="0" y="20" width="200" height="15" fill="#DC2626"/>
+  <rect x="0" y="45" width="200" height="8" fill="#DC2626"/>
+  <!-- Intricate woven diamond motifs -->
+  <polygon points="40,90 55,75 70,90 55,105" fill="#DC2626"/>
+  <polygon points="90,90 105,75 120,90 105,105" fill="#DC2626"/>
+  <polygon points="140,90 155,75 170,90 155,105" fill="#DC2626"/>
+  <!-- Paisley / Gathia flower motif -->
+  <circle cx="55" cy="90" r="4" fill="#FFFFFF"/>
+  <circle cx="105" cy="90" r="4" fill="#FFFFFF"/>
+  <circle cx="155" cy="90" r="4" fill="#FFFFFF"/>
+  <!-- Fringe tassels at bottom -->
+  <line x1="0" y1="165" x2="200" y2="165" stroke="#DC2626" stroke-width="6"/>
+  <path d="M 10 170 L 10 195 M 30 170 L 30 195 M 50 170 L 50 195 M 70 170 L 70 195 M 90 170 L 90 195 M 110 170 L 110 195 M 130 170 L 130 195 M 150 170 L 150 195 M 170 170 L 170 195 M 190 170 L 190 195" stroke="#DC2626" stroke-width="3"/>
+</svg>

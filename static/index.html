@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XORON - Cognitive Care in the Language of Home | SIH 2026</title>
+  <!-- Mobile App Manifest & Icons (PWA & Android Standalone) -->
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#B45309">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="/static/assets/icon-192.png">
+  <link rel="icon" type="image/png" href="/static/assets/icon-192.png">
+  <!-- Tailwind CSS CDN for modern responsive layout -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-[#FAF7F2] text-gray-800 min-h-screen flex flex-col font-sans">
+
+  <!-- TOP HEADER & BRAND BAR -->
+  <header class="bg-white border-b border-amber-100 shadow-sm sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & SIH Badge -->
+      <div class="flex items-center gap-3.5 cursor-pointer" onclick="window.app.switchTab('patient')">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white text-2xl shadow-md flex-shrink-0">
+          🧠
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl font-black tracking-tight text-amber-950" data-i18n="appName">XORON (স্মৰণ)</span>
+            <span class="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+              SIH26003 • MedTech
+            </span>
+          </div>
+          <p class="text-xs text-amber-800 font-medium" data-i18n="appTagline">
+            Cognitive Care in the Language of Home • Team Invincible Core
+          </p>
+        </div>
+      </div>
+
+      <!-- Language Selector (English + 5 NER Languages) -->
+      <div class="flex items-center gap-1.5 flex-wrap bg-amber-50 p-1.5 rounded-full border border-amber-200">
+        <span class="text-xs font-bold text-amber-900 px-2 flex items-center gap-1">
+          <span>🌐</span> <span>Lang:</span>
+        </span>
+        <button onclick="window.app.changeLanguage('en')" class="lang-pill" data-lang="en">English</button>
+        <button onclick="window.app.changeLanguage('as')" class="lang-pill active-lang" data-lang="as">অসমীয়া</button>
+        <button onclick="window.app.changeLanguage('bn')" class="lang-pill" data-lang="bn">বাংলা</button>
+        <button onclick="window.app.changeLanguage('brx')" class="lang-pill" data-lang="brx">बड़ो</button>
+        <button onclick="window.app.changeLanguage('mni')" class="lang-pill" data-lang="mni">মৈতৈলোন্</button>
+        <button onclick="window.app.changeLanguage('ne')" class="lang-pill" data-lang="ne">नेपाली</button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Install Mobile App (PWA) Button -->
+        <button id="btn-install-app" onclick="window.app.promptInstallMobileApp()" class="px-4 py-2 rounded-2xl flex items-center gap-2 text-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow-sm active:scale-95 transition">
+          <span>📲</span> <span>Install App</span>
+        </button>
+
+        <!-- Quick Action: AI Memory Assistant Trigger -->
+        <button onclick="window.memoryChatbot.toggleChat(true)" class="btn-warm px-4 py-2 rounded-2xl flex items-center gap-2 text-sm shadow-sm active:scale-95 transition">
+          <span>🎙️</span> <span data-i18n="btnOpenChatbot">Ask Memory Companion</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mode Navigation Tabs -->
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-2 overflow-x-auto border-t border-amber-50">
+      <button onclick="window.app.switchTab('patient')" class="nav-tab-btn nav-tab-active" data-tab="patient" data-i18n="navPatient">
+        Patient App
+      </button>
+      <button onclick="window.app.switchTab('reminiscence')" class="nav-tab-btn" data-tab="reminiscence" data-i18n="btnReminiscence">
+        Family Story Vault
+      </button>
+      <button onclick="window.app.switchTab('caregiver')" class="nav-tab-btn" data-tab="caregiver" data-i18n="navCaregiver">
+        Caregiver Command Centre
+      </button>
+      <button onclick="window.app.switchTab('asha')" class="nav-tab-btn" data-tab="asha" data-i18n="navAsha">
+        ASHA Health Worker Portal
+      </button>
+      <button onclick="window.app.switchTab('widget')" class="nav-tab-btn" data-tab="widget" data-i18n="navWidget">
+        Home-Screen Widget
+      </button>
+      <button onclick="window.app.switchTab('sih')" class="nav-tab-btn" data-tab="sih" data-i18n="navSih">
+        SIH 2026 Pitch & Research
+      </button>
+      <button onclick="window.app.toggleMobileFrame()" class="nav-tab-btn bg-amber-50 text-amber-900 flex items-center gap-1.5 ml-auto font-bold border border-amber-300">
+        <span>📱</span> <span id="mobile-frame-btn-text">Phone Frame View</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+
+    <!-- ================================================================= -->
+    <!-- VIEW 1: PATIENT APP EXPERIENCE (ULTRA-SIMPLE, VOICE-FIRST, ZERO-ANXIETY) -->
+    <!-- ================================================================= -->
+    <div id="view-patient" class="view-container space-y-8">
+      
+      <!-- Patient Welcome & Reality Orientation Banner -->
+      <div class="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-100 rounded-3xl p-6 sm:p-8 border-2 border-amber-200 shadow-sm relative overflow-hidden">
+        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div>
+            <div class="inline-flex items-center gap-2 bg-amber-200/70 text-amber-900 text-xs font-bold px-3 py-1 rounded-full mb-3">
+              <span>☀️</span> <span data-i18n="realityTitle">Today Is...</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-black text-amber-950 tracking-tight" data-i18n="welcomeAita">
+              Welcome home, Aita!
+            </h1>
+            <p class="text-base sm:text-lg text-amber-900 mt-2 font-medium" data-i18n="subtitleOrientation">
+              Today is Tuesday, 8th September • Peaceful Morning in Dispur, Guwahati
+            </p>
+            <div class="mt-4 flex flex-wrap gap-2 text-xs font-bold text-amber-800">
+              <span class="bg-white/80 px-3 py-1.5 rounded-xl border border-amber-200">🍵 Morning Chai Time</span>
+              <span class="bg-white/80 px-3 py-1.5 rounded-xl border border-amber-200">🌸 Kopou Orchid Season</span>
+              <span class="bg-white/80 px-3 py-1.5 rounded-xl border border-amber-200">🏠 Safe with Caregiver Anjali</span>
+            </div>
+          </div>
+
+          <!-- Large Play Button: Today's 3 Games (Guided Micro-Session) -->
+          <button onclick="window.games.startDailyGuidedSession()" class="btn-warm px-8 py-5 rounded-3xl text-xl sm:text-2xl font-black shadow-lg flex items-center gap-4 flex-shrink-0 active:scale-95 transition">
+            <span class="text-3xl">▶️</span>
+            <div class="text-left">
+              <div data-i18n="btnPlayDailySession">Play Today's 3 Games</div>
+              <div class="text-xs font-normal text-amber-100" data-i18n="btnDailySessionSub">10 mins • Zero anxiety • Culturally familiar</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Living Memory Bank Family Ribbon -->
+      <div class="bg-white rounded-3xl p-6 border-2 border-amber-100 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">👨‍👩‍👧‍👦</span>
+            <h3 class="text-xl font-bold text-gray-800">Your Loving Family (Living Memory Bank)</h3>
+          </div>
+          <button onclick="window.reminiscence.startWhoIsThisGame()" class="text-sm font-bold text-amber-700 hover:text-amber-900 flex items-center gap-1">
+            <span>🖼️</span> <span data-i18n="btnWhoIsThis">Who is This?</span> →
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <!-- Dr. Priya -->
+          <div onclick="window.reminiscence.playMemberVoice(0)" class="family-card p-4 rounded-2xl bg-amber-50/50 border border-amber-200 hover:border-amber-400 cursor-pointer text-center">
+            <div class="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-emerald-400 mb-2">
+              <img src="/static/assets/photos/daughter_priya.svg" alt="Priya" class="w-full h-full object-cover">
+            </div>
+            <div class="font-bold text-gray-800 text-sm">Dr. Priya Baruah</div>
+            <div class="text-xs text-emerald-700 font-semibold">Daughter (জীয়াৰী)</div>
+            <div class="mt-2 text-xs text-amber-700 bg-white py-1 px-2 rounded-lg font-bold">🔊 Hear Voice</div>
+          </div>
+
+          <!-- Rohan -->
+          <div onclick="window.reminiscence.playMemberVoice(1)" class="family-card p-4 rounded-2xl bg-amber-50/50 border border-amber-200 hover:border-amber-400 cursor-pointer text-center">
+            <div class="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-blue-400 mb-2">
+              <img src="/static/assets/photos/grandson_rohan.svg" alt="Rohan" class="w-full h-full object-cover">
+            </div>
+            <div class="font-bold text-gray-800 text-sm">Rohan Baruah</div>
+            <div class="text-xs text-blue-700 font-semibold">Grandson (নাতি)</div>
+            <div class="mt-2 text-xs text-amber-700 bg-white py-1 px-2 rounded-lg font-bold">🔊 Hear Voice</div>
+          </div>
+
+          <!-- Late Biren -->
+          <div onclick="window.reminiscence.playMemberVoice(2)" class="family-card p-4 rounded-2xl bg-amber-50/50 border border-amber-200 hover:border-amber-400 cursor-pointer text-center">
+            <div class="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-amber-400 mb-2">
+              <img src="/static/assets/photos/husband_biren.svg" alt="Biren" class="w-full h-full object-cover">
+            </div>
+            <div class="font-bold text-gray-800 text-sm">Late Biren Baruah</div>
+            <div class="text-xs text-amber-800 font-semibold">Husband (স্বামী)</div>
+            <div class="mt-2 text-xs text-amber-700 bg-white py-1 px-2 rounded-lg font-bold">🔊 Hear Story</div>
+          </div>
+
+          <!-- Anjali -->
+          <div onclick="window.reminiscence.playMemberVoice(3)" class="family-card p-4 rounded-2xl bg-amber-50/50 border border-amber-200 hover:border-amber-400 cursor-pointer text-center">
+            <div class="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-rose-400 mb-2">
+              <img src="/static/assets/photos/caregiver_anjali.svg" alt="Anjali" class="w-full h-full object-cover">
+            </div>
+            <div class="font-bold text-gray-800 text-sm">Anjali Baruah</div>
+            <div class="text-xs text-rose-700 font-semibold">Caregiver (বোৱাৰী)</div>
+            <div class="mt-2 text-xs text-amber-700 bg-white py-1 px-2 rounded-lg font-bold">🔊 Hear Voice</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily Routine & Medication Reminders Section -->
+      <div class="bg-white rounded-3xl p-6 border-2 border-amber-100 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">⏰</span>
+            <h3 class="text-xl font-bold text-gray-800" data-i18n="remindersTitle">Daily Routine & Medication</h3>
+          </div>
+          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full">
+            100% On-Time Adherence
+          </span>
+        </div>
+        <div id="reminders-cards-container" class="space-y-3">
+          <!-- Populated by reminders.js -->
+        </div>
+      </div>
+
+      <!-- 11 Culturally Tailored Adaptive Cognitive Games Hub -->
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2" data-i18n="gameHubTitle">
+              <span>🎮</span> 11 Adaptive Cognitive Mini-Games
+            </h2>
+            <p class="text-gray-600 text-sm" data-i18n="gameHubSubtitle">
+              Evidence-based cognitive training inspired by North Eastern culture
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          
+          <!-- Game 1: Who is This? -->
+          <div onclick="window.games.openGame('game-01')" class="game-card p-5 rounded-3xl bg-white border-2 border-amber-100 hover:border-amber-400 cursor-pointer shadow-sm hover:shadow-md flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center text-3xl flex-shrink-0">
+              🖼️
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 text-base" data-i18n="g1Title">1. Who is This?</h4>
+              <p class="text-xs text-gray-600 mt-1" data-i18n="g1Desc">Family face and relationship recall with voice hints</p>
+              <span class="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800">Domain: Memory</span>
+            </div>
+          </div>
+
+          <!-- Game 2: Our Story -->
+          <div onclick="window.games.openGame('game-02')" class="game-card p-5 rounded-3xl bg-white border-2 border-amber-100 hover:border-amber-400 cursor-pointer shadow-sm hover:shadow-md flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-rose-100 text-rose-800 flex items-center justify-center text-3xl flex-shrink-0">
+              📖
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 text-base" data-i18n="g2Title">2. Our Story</h4>
+              <p class="text-xs text-gray-600 mt-1" data-i18n="g2Desc">Reminiscence narrative and photo timeline</p>
+              <span class="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-800">Domain: Reminiscence</span>
+            </div>
+          </div>
+
+          <!-- Game 3: Today is... -->
+          <div onclick="window.games.openGame('game-03')" class="game-card p-5 rounded-3xl bg-white border-2 border-amber-100 hover:border-amber-400 cursor-pointer shadow-sm hover:shadow-md flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-blue-100 text-blue-800 flex items-center justify-center text-3xl flex-shrink-0">
+              ☀️
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 text-base" data-i18n="g3Title">3. Today is...</h4>
+              <p class="text-xs text-gray-600 mt-1" data-i18n="g3Desc">Reality orientation and temporal grounding</p>
+              <span class="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-800">Domain: Attention</span>
+            </div>
+          </div>
+
+          <!-- Game 4: Textile & Pattern Match -->
+          <div onclick="window.games.openGame('game-04')" class="game-card p-5 rounded-3xl bg-white border-2 border-amber-100 hover:border-amber-400 cursor-pointer shadow-sm hover:shadow-md flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-red-100 text-red-800 flex items-center justify-center text-3xl flex-shrink-0">
+              🧣
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 text-base" data-i18n="g4Title">4. Textile & Pattern Match</h4>
+              <p class="text-xs text-gray-600 mt-1" data-i18n="g4Desc">Match traditional Gamusa & Mekhela Sador motifs</p>
+              <span class="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded bg-red-50 text-red-800">Domain: Visuospatial</span>
+            </div>
+          </div>
+
+          <!-- Game 5: Sounds of Home -->
+          <div onclick="window.games.openGame('game-05')" class="game-card p-5 rounded-3xl bg-white border-2 border-amber-100 hover:border-amber-400 cursor-pointer shadow-sm hover:shadow-md flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center text-3xl flex-shrink-0">
+              🥁
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 text-base" data-i18n="g5Title">5. Sounds of Home</h4>
+              <p class="text-xs text-gray-600 mt-1" data-i18n="g5Desc">Auditory memory of Bihu Dhol, Pepa & morning rain</p>
+              <span class="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800">Domain: Memory</span>
+            </div>
+          </div>
+
+          <!-- Game 6: Market Basket -->
+          <div onclick="window.games.openGame('game-06')" class="game-card p-5 rounded-3xl bg-white border-2 border-amber-100 hover:border-amber-400 cursor-pointer shadow-sm hover:shadow-md flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center text-3xl flex-shrink-0">
+              🧺
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 text-base" data-i18n="g6Title">6. Market Basket</h4>
+              <p class="text-xs text-gray-600 mt-1" data-i18n="g6Desc">Remember regional ingredients: Kazi Nemu, Joha rice</p>
+              <span class="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800">Domain: Executive</span>
+            </div>
+          </div>
+
+          <!-- Game 7: Festival Sequence -->
+          <div onclick="window.games.openGame('game-07')" class="game-card p-5 rounded-3xl bg-white border-2 border-amber-100 hover:border-amber-400 cursor-pointer shadow-sm hover:shadow-md flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-purple-100 text-purple-800 flex items-center justify-center text-3xl flex-shrink-0">
+              🌾
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 text-base" data-i18n="g7Title">7. Festival Sequence</h4>
+              <p class="text-xs text-gray-600 mt-1" data-i18n="g7Desc">Put seasonal celebrations in harmonious order</p>
+              <span class="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded bg-purple-50 text-purple-800">Domain: Executive</span>
+            </div>
+          </div>
+
+          <!-- Game 8: Daily Routine Sorting -->
+          <div onclick="window.games.openGame('game-08')" class="game-card p-5 rounded-3xl bg-white border-2 border-amber-100 hover:border-amber-400 cursor-pointer shadow-sm hover:shadow-md flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-orange-100 text-orange-800 flex items-center justify-center text-3xl flex-shrink-0">
+              ☕
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 text-base" data-i18n="g8Title">8. Daily Routine Sorting</h4>
+              <p class="text-xs text-gray-600 mt-1" data-i18n="g8Desc">Tea, Tulsi prayer, Medicine & Stroll</p>
+              <span class="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded bg-orange-50 text-orange-800">Domain: Executive</span>
+            </div>
+          </div>
+
+          <!-- Game 9: Shadow & Utensil Match -->
+          <div onclick="window.games.openGame('game-09')" class="game-card p-5 rounded-3xl bg-white border-2 border-amber-100 hover:border-amber-400 cursor-pointer shadow-sm hover:shadow-md flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-yellow-100 text-yellow-800 flex items-center justify-center text-3xl flex-shrink-0">
+              ✨
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 text-base" data-i18n="g9Title">9. Shadow & Utensil Match</h4>
+              <p class="text-xs text-gray-600 mt-1" data-i18n="g9Desc">Match traditional Xorai, Bota & brass vessels</p>
+              <span class="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded bg-yellow-50 text-yellow-800">Domain: Visuospatial</span>
+            </div>
+          </div>
+
+          <!-- Game 10: Folk Song Completion -->
+          <div onclick="window.games.openGame('game-10')" class="game-card p-5 rounded-3xl bg-white border-2 border-amber-100 hover:border-amber-400 cursor-pointer shadow-sm hover:shadow-md flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-100 text-indigo-800 flex items-center justify-center text-3xl flex-shrink-0">
+              🎶
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 text-base" data-i18n="g10Title">10. Folk Song Completion</h4>
+              <p class="text-xs text-gray-600 mt-1" data-i18n="g10Desc">Complete beloved evergreen melodies & lyrics</p>
+              <span class="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-800">Domain: Verbal</span>
+            </div>
+          </div>
+
+          <!-- Game 11: Gentle Flower Tap -->
+          <div onclick="window.games.openGame('game-11')" class="game-card p-5 rounded-3xl bg-white border-2 border-amber-100 hover:border-amber-400 cursor-pointer shadow-sm hover:shadow-md flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-pink-100 text-pink-800 flex items-center justify-center text-3xl flex-shrink-0">
+              🌸
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-800 text-base" data-i18n="g11Title">11. Gentle Flower Tap</h4>
+              <p class="text-xs text-gray-600 mt-1" data-i18n="g11Desc">Sustained attention tapping blooming Kopou orchids</p>
+              <span class="inline-block mt-2 text-[10px] font-bold px-2 py-0.5 rounded bg-pink-50 text-pink-800">Domain: Attention</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 2: FAMILY REMINISCENCE VAULT ("OUR STORY" / আমাৰ কাহিনী) -->
+    <!-- ================================================================= -->
+    <div id="view-reminiscence" class="view-container hidden">
+      <div id="reminiscence-vault-container">
+        <!-- Rendered dynamically by reminiscence.js -->
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 3: CAREGIVER COMMAND CENTRE (LONGITUDINAL TRENDS & MEDIA VAULT) -->
+    <!-- ================================================================= -->
+    <div id="view-caregiver" class="view-container hidden space-y-6">
+      
+      <!-- Top Profile & Summary -->
+      <div class="bg-white rounded-3xl p-6 border-2 border-amber-100 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full">Active Patient Profile</span>
+            <span class="text-xs text-gray-500">ID: pat-ner-001</span>
+          </div>
+          <h2 class="text-2xl font-black text-gray-800">Hemlata Baruah (Aita) • 78 Yrs</h2>
+          <p class="text-sm text-gray-600">Dispur, Guwahati • Stage: Mild Cognitive Impairment (LASI Cohort Validated)</p>
+          <div class="mt-2 text-xs text-amber-800 font-semibold">
+            Primary Caregiver: Anjali Baruah (+91 94350 12345) • ASHA: Maini Saikia (Dispur PHC)
+          </div>
+        </div>
+
+        <button onclick="window.caregiver.exportClinicalAssessment()" class="btn-warm px-5 py-3 rounded-2xl font-bold text-sm shadow-sm flex items-center gap-2">
+          <span>📄</span> <span data-i18n="cgExportReport">Export Clinical Assessment (PDF)</span>
+        </button>
+      </div>
+
+      <!-- Longitudinal Charts Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 14-Day Trajectory -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-amber-100 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">
+              <span>📈</span> <span data-i18n="cgLongitudinalTrends">Cognitive Trends (14-Day Trajectory)</span>
+            </h3>
+            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">+16% Stability</span>
+          </div>
+          <div id="cg-trajectory-chart" class="py-2">
+            <!-- Rendered by caregiver.js -->
+          </div>
+        </div>
+
+        <!-- 5-Domain Cognitive Radar Breakdown -->
+        <div class="bg-white rounded-3xl p-6 border-2 border-amber-100 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">
+              <span>🧠</span> <span>Cognitive Domain Breakdown</span>
+            </h3>
+            <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full">5 Clinical Domains</span>
+          </div>
+          <div id="cg-domain-bars">
+            <!-- Rendered by caregiver.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Family Member to Living Memory Bank Form -->
+      <div class="bg-white rounded-3xl p-6 border-2 border-amber-100 shadow-sm">
+        <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
+          <span>➕</span> <span data-i18n="cgAddFamilyMember">Add Member to Living Memory Bank</span>
+        </h3>
+        <p class="text-xs text-gray-600 mb-4">
+          Upload 1 photo and voice note. XORON's on-device intelligence identifies them across family albums and sets up gentle voice recall.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Full Name</label>
+            <input type="text" id="new-mem-name" placeholder="e.g. Manab Baruah" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Relationship</label>
+            <input type="text" id="new-mem-relation" placeholder="e.g. Brother / ভায়েক" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Current Residence</label>
+            <input type="text" id="new-mem-location" placeholder="e.g. Dibrugarh, Assam" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Voice Note / Clue Text</label>
+            <input type="text" id="new-mem-voice" placeholder="e.g. Aita, remember our wooden boat ride on the Brahmaputra?" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+
+        <div class="mt-4 flex justify-end">
+          <button onclick="window.caregiver.addFamilyMember()" class="btn-warm px-6 py-2.5 rounded-xl font-bold text-sm shadow-sm">
+            Save to Memory Bank
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 4: ASHA HEALTH WORKER VILLAGE COHORT (SLIDE 5) -->
+    <!-- ================================================================= -->
+    <div id="view-asha" class="view-container hidden space-y-6">
+      <div class="bg-white rounded-3xl p-6 border-2 border-amber-100 shadow-sm">
+        <div class="mb-4">
+          <div class="inline-block bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full mb-2">
+            Community Health Worker Dashboard
+          </div>
+          <h2 class="text-2xl font-black text-gray-800" data-i18n="ashaTitle">
+            ASHA & Community Health Worker Cohort View
+          </h2>
+          <p class="text-sm text-gray-600" data-i18n="ashaSubtitle">
+            Monitoring rural elderly dementia patients across Dispur & Kamrup cluster
+          </p>
+        </div>
+
+        <div id="asha-cohort-table">
+          <!-- Populated by caregiver.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 5: ANDROID HOME-SCREEN WIDGET SIMULATOR (SLIDE 1 & 3) -->
+    <!-- ================================================================= -->
+    <div id="view-widget" class="view-container hidden flex flex-col items-center justify-center py-8">
+      <div class="text-center max-w-md mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-1">Simulated Android Home-Screen Widget</h2>
+        <p class="text-xs text-gray-600">
+          The caregiver sets it up once. The widget speaks first: one tap starts a session with zero menus.
+        </p>
+      </div>
+
+      <!-- Widget Frame Mockup -->
+      <div class="w-full max-w-sm p-4 bg-gray-900 rounded-[40px] shadow-2xl border-4 border-gray-800">
+        <!-- Status Bar -->
+        <div class="flex justify-between items-center text-gray-400 text-xs px-3 mb-4 font-mono">
+          <span>08:30 AM</span>
+          <div class="flex items-center gap-1.5">
+            <span>📶</span> <span>🔋 94%</span>
+          </div>
+        </div>
+
+        <div id="homescreen-widget-preview">
+          <!-- Rendered by reminders.js -->
+        </div>
+
+        <!-- Android Nav Bar Pill -->
+        <div class="w-32 h-1 bg-gray-600 rounded-full mx-auto mt-6"></div>
+      </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- VIEW 6: SIH 2026 PITCH & RESEARCH SHOWCASE -->
+    <!-- ================================================================= -->
+    <div id="view-sih" class="view-container hidden space-y-6">
+      
+      <!-- Pitch Header -->
+      <div class="bg-white rounded-3xl p-8 border-2 border-amber-200 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-amber-100 pb-6 mb-6">
+          <div>
+            <span class="text-xs font-black uppercase tracking-wider bg-amber-100 text-amber-900 px-3 py-1 rounded-full">
+              Smart India Hackathon 2026 • SIH26003
+            </span>
+            <h1 class="text-3xl font-black text-gray-900 mt-2">
+              XORON (স্মৰণ): Cognitive Care in the Language of Home
+            </h1>
+            <p class="text-base text-gray-700 mt-1 font-medium">
+              AI-Based Cognitive Gaming and Memory Assistance Platform for Elderly Dementia Patients in NER
+            </p>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-gray-500 uppercase font-bold">Team Name</div>
+            <div class="text-xl font-extrabold text-amber-900">Invincible Core</div>
+            <div class="text-xs text-emerald-700 font-semibold mt-1">MedTech / BioTech / HealthTech</div>
+          </div>
+        </div>
+
+        <!-- LASI Statistics & Impact -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-center">
+            <div class="text-3xl font-black text-amber-900">8.8 Million</div>
+            <div class="text-xs text-gray-700 mt-1">Indians aged 60+ living with dementia (LASI 2023)</div>
+          </div>
+          <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 text-center">
+            <div class="text-3xl font-black text-emerald-900">7.4%</div>
+            <div class="text-xs text-gray-700 mt-1">Prevalence in 60+ population (higher in rural NER)</div>
+          </div>
+          <div class="p-4 bg-blue-50 rounded-2xl border border-blue-200 text-center">
+            <div class="text-3xl font-black text-blue-900">6 Languages</div>
+            <div class="text-xs text-gray-700 mt-1">Assamese, Bodo, Manipuri, Nepali, Bengali + English</div>
+          </div>
+        </div>
+
+        <!-- Clinical Evidence & Design Decisions -->
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Evidence Traceability (Slide 6 Grounding)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200">
+            <div class="font-bold text-gray-800">CCT Meta-analyses (Hill 2017 / Chan 2024)</div>
+            <p class="text-xs text-gray-600 mt-1">Several short adaptive games (~10-15 mins) rather than one long exhausting training session.</p>
+          </div>
+          <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200">
+            <div class="font-bold text-gray-800">Reminiscence Therapy (Cochrane Review, Woods 2018)</div>
+            <p class="text-xs text-gray-600 mt-1">"Our Story" and "Who is This?" personal family photos and authentic family voice notes.</p>
+          </div>
+          <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200">
+            <div class="font-bold text-gray-800">Errorless Learning (Occupational Therapy Practice)</div>
+            <p class="text-xs text-gray-600 mt-1">Cues fade only after repeated success; app NEVER buzzes a failure buzzer. Eliminates anxiety.</p>
+          </div>
+          <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200">
+            <div class="font-bold text-gray-800">Spaced Retrieval & Reality Orientation</div>
+            <p class="text-xs text-gray-600 mt-1">Recall intervals grow dynamically; daily "Today is..." reality orientation tied to family dates.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================================================================= -->
+  <!-- MODAL: UNIVERSAL GAME MODAL -->
+  <!-- ================================================================= -->
+  <div id="game-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl relative border-2 border-amber-200">
+      <button onclick="document.getElementById('game-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold">
+        ✕
+      </button>
+      <div id="game-modal-content">
+        <!-- Dynamic game content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- MODAL: AI MEMORY ASSISTANCE CHATBOT ("XORON SATHI" / স্মৰণ সংগী) -->
+  <!-- ================================================================= -->
+  <div id="chat-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-2xl w-full h-[88vh] max-h-[700px] flex flex-col shadow-2xl border-2 border-amber-300 overflow-hidden">
+      
+      <!-- Chat Header -->
+      <div class="bg-gradient-to-r from-amber-600 to-amber-800 p-4 text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl">
+            🌸
+          </div>
+          <div>
+            <h3 class="font-bold text-lg leading-snug" data-i18n="chatTitle">Xoron Sathi - AI Memory Companion</h3>
+            <p class="text-xs text-amber-100" data-i18n="chatSubtitle">Ask me anything about your family, home, or daily routine</p>
+          </div>
+        </div>
+        <button onclick="window.memoryChatbot.toggleChat(false)" class="text-white/80 hover:text-white text-2xl font-bold">
+          ✕
+        </button>
+      </div>
+
+      <!-- Chat Messages Container -->
+      <div id="chat-messages-list" class="flex-grow p-4 overflow-y-auto space-y-3 bg-[#FAF7F2]">
+        <!-- Populated dynamically by chatbot.js -->
+      </div>
+
+      <!-- Quick Topic Chips -->
+      <div class="p-2.5 bg-amber-50 border-t border-amber-100 flex items-center gap-2 overflow-x-auto">
+        <button onclick="window.memoryChatbot.askPredefined('Who is my daughter?')" class="text-xs font-bold whitespace-nowrap bg-white border border-amber-300 text-amber-900 px-3 py-1.5 rounded-full hover:bg-amber-100 transition" data-i18n="chipWhoDaughter">
+          Who is my daughter?
+        </button>
+        <button onclick="window.memoryChatbot.askPredefined('Where am I right now?')" class="text-xs font-bold whitespace-nowrap bg-white border border-amber-300 text-amber-900 px-3 py-1.5 rounded-full hover:bg-amber-100 transition" data-i18n="chipWhereAmI">
+          Where am I right now?
+        </button>
+        <button onclick="window.memoryChatbot.askPredefined('What is my next medicine?')" class="text-xs font-bold whitespace-nowrap bg-white border border-amber-300 text-amber-900 px-3 py-1.5 rounded-full hover:bg-amber-100 transition" data-i18n="chipNextMed">
+          What is my next medicine?
+        </button>
+        <button onclick="window.memoryChatbot.askPredefined('Tell me a Bihu story')" class="text-xs font-bold whitespace-nowrap bg-white border border-amber-300 text-amber-900 px-3 py-1.5 rounded-full hover:bg-amber-100 transition" data-i18n="chipTellStory">
+          Tell me a Bihu story
+        </button>
+        <button onclick="window.memoryChatbot.askPredefined('I feel a bit worried')" class="text-xs font-bold whitespace-nowrap bg-white border border-amber-300 text-amber-900 px-3 py-1.5 rounded-full hover:bg-amber-100 transition" data-i18n="chipFeelingWorried">
+          I feel a bit worried
+        </button>
+      </div>
+
+      <!-- Voice & Text Input Bar -->
+      <div class="p-3 bg-white border-t border-gray-200 flex items-center gap-2">
+        <button id="chat-mic-btn" onclick="window.memoryChatbot.startVoiceInput()" class="w-12 h-12 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-center text-xl flex-shrink-0 shadow-sm transition active:scale-95">
+          🎙️
+        </button>
+        <div class="flex-grow relative">
+          <input type="text" id="chat-input-text" onkeydown="if(event.key==='Enter') window.memoryChatbot.sendTextQuery()"
+            placeholder="Speak or type your question..." data-i18n="chatPlaceholder"
+            class="w-full px-4 py-3 rounded-2xl border-2 border-amber-200 text-sm focus:outline-none focus:border-amber-600 pr-10">
+          <button onclick="window.memoryChatbot.sendTextQuery()" class="absolute right-2.5 top-2.5 text-amber-700 hover:text-amber-900 font-bold text-lg">
+            ➔
+          </button>
+        </div>
+      </div>
+      <div id="chat-voice-status" class="text-center text-xs text-amber-800 font-bold py-1 bg-amber-50"></div>
+    </div>
+  </div>
+
+  <!-- FLOATING PERSISTENT SATHI BUTTON -->
+  <button onclick="window.memoryChatbot.toggleChat(true)" title="Ask Xoron Sathi"
+    class="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 text-white text-2xl flex items-center justify-center shadow-2xl border-4 border-white hover:scale-105 active:scale-95 transition z-40">
+    🌸
+  </button>
+
+  <!-- SCRIPTS -->
+  <script src="/static/js/i18n.js"></script>
+  <script src="/static/js/speech.js"></script>
+  <script src="/static/js/adaptive_engine.js"></script>
+  <script src="/static/js/reminiscence.js"></script>
+  <script src="/static/js/chatbot.js"></script>
+  <script src="/static/js/games.js"></script>
+  <script src="/static/js/reminders.js"></script>
+  <script src="/static/js/caregiver.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

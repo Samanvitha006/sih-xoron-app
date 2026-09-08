@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg_anjali" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCE7F3"/>
+      <stop offset="100%" stop-color="#FBCFE8"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" rx="40" fill="url(#bg_anjali)"/>
+  <circle cx="200" cy="145" r="75" fill="#F8D3B8"/>
+  <!-- Hair with bun -->
+  <circle cx="200" cy="70" r="35" fill="#2C221E"/>
+  <path d="M 125 150 C 125 75 275 75 275 150 C 275 190 265 210 260 220 C 240 170 230 120 200 120 C 170 120 160 170 140 220 Z" fill="#2C221E"/>
+  <!-- Bindi & Features -->
+  <circle cx="200" cy="128" r="4" fill="#E11D48"/>
+  <ellipse cx="170" cy="145" rx="7" ry="4" fill="#2C221E"/>
+  <ellipse cx="230" cy="145" rx="7" ry="4" fill="#2C221E"/>
+  <path d="M 175 180 Q 200 205 225 180" stroke="#BE185D" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Traditional Mekhela Sador Yellow / Gold -->
+  <path d="M 115 400 C 115 280 145 240 200 240 C 255 240 285 280 285 400 Z" fill="#FBBF24"/>
+  <!-- Sador drape with red motifs -->
+  <path d="M 140 250 Q 200 310 260 380 L 285 400 L 220 400 Q 180 320 130 280 Z" fill="#DC2626"/>
+  <!-- Cup of tea held gently -->
+  <rect x="180" y="310" width="40" height="30" rx="8" fill="#FFF" stroke="#D97706" stroke-width="2"/>
+  <path d="M 220 318 Q 232 325 220 332" stroke="#D97706" stroke-width="3" fill="none"/>
+  <path d="M 190 300 Q 195 290 190 285" stroke="#D97706" stroke-width="2" fill="none"/>
+  <path d="M 205 300 Q 210 290 205 285" stroke="#D97706" stroke-width="2" fill="none"/>
+  <text x="200" y="380" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="bold" fill="#831843" text-anchor="middle">Anjali (Caregiver / Daughter-in-law)</text>
+</svg>

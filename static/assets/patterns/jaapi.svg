@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <!-- Outer Woven Bamboo Brim -->
+  <polygon points="100,20 185,160 15,160" fill="#FEF08A" stroke="#CA8A04" stroke-width="4"/>
+  <!-- Concentric traditional red & green circular cloth patterns -->
+  <polygon points="100,50 160,150 40,150" fill="#EF4444"/>
+  <polygon points="100,80 140,145 60,145" fill="#10B981"/>
+  <polygon points="100,105 125,142 75,142" fill="#FEF08A"/>
+  <!-- Center red peak -->
+  <circle cx="100" cy="35" r="10" fill="#DC2626"/>
+  <circle cx="100" cy="130" r="8" fill="#DC2626"/>
+  <!-- Red fringe tassels -->
+  <line x1="20" y1="160" x2="15" y2="175" stroke="#DC2626" stroke-width="3"/>
+  <line x1="60" y1="160" x2="58" y2="175" stroke="#DC2626" stroke-width="3"/>
+  <line x1="100" y1="160" x2="100" y2="175" stroke="#DC2626" stroke-width="3"/>
+  <line x1="140" y1="160" x2="142" y2="175" stroke="#DC2626" stroke-width="3"/>
+  <line x1="180" y1="160" x2="185" y2="175" stroke="#DC2626" stroke-width="3"/>
+</svg>

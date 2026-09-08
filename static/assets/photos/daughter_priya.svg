@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg_priya" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EBF4F6"/>
+      <stop offset="100%" stop-color="#D1E8E2"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" rx="40" fill="url(#bg_priya)"/>
+  <!-- Portrait circle -->
+  <circle cx="200" cy="150" r="85" fill="#F8D3B8"/>
+  <!-- Hair -->
+  <path d="M 115 150 C 115 70 285 70 285 150 C 285 180 275 220 270 240 C 250 200 240 130 200 130 C 160 130 150 200 130 240 Z" fill="#2C221E"/>
+  <ellipse cx="200" cy="85" rx="80" ry="35" fill="#2C221E"/>
+  <!-- Face features -->
+  <ellipse cx="170" cy="155" rx="8" ry="5" fill="#2C221E"/>
+  <ellipse cx="230" cy="155" rx="8" ry="5" fill="#2C221E"/>
+  <!-- Smile -->
+  <path d="M 175 190 Q 200 215 225 190" stroke="#C05840" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Red Bindi -->
+  <circle cx="200" cy="135" r="4" fill="#C52828"/>
+  <!-- Doctor White Coat & Turquoise Kurti -->
+  <path d="M 110 400 C 110 280 140 240 200 240 C 260 240 290 280 290 400 Z" fill="#1ABC9C"/>
+  <path d="M 120 400 C 125 290 145 255 175 250 L 165 400 Z" fill="#FFFFFF"/>
+  <path d="M 280 400 C 275 290 255 255 225 250 L 235 400 Z" fill="#FFFFFF"/>
+  <!-- Stethoscope -->
+  <path d="M 165 260 C 165 330 235 330 235 260" stroke="#34495E" stroke-width="5" fill="none"/>
+  <circle cx="200" cy="335" r="14" fill="#BDC3C7" stroke="#2C3E50" stroke-width="4"/>
+  <!-- Badge -->
+  <rect x="235" y="280" width="30" height="15" rx="3" fill="#E74C3C"/>
+  <text x="200" y="380" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="bold" fill="#0B4F48" text-anchor="middle">Dr. Priya (Daughter)</text>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <!-- Stand base -->
+  <ellipse cx="100" cy="175" rx="60" ry="15" fill="#D97706"/>
+  <path d="M 85 175 L 95 110 L 105 110 L 115 175 Z" fill="#F59E0B"/>
+  <!-- Middle Tier -->
+  <ellipse cx="100" cy="110" rx="35" ry="8" fill="#D97706"/>
+  <path d="M 92 110 L 96 75 L 104 75 L 108 110 Z" fill="#F59E0B"/>
+  <!-- Top Plate -->
+  <ellipse cx="100" cy="75" rx="75" ry="20" fill="#FBBF24" stroke="#B45309" stroke-width="3"/>
+  <!-- Xorai Cone Dome / Lid with finial -->
+  <path d="M 40 75 Q 100 -5 160 75 Z" fill="#F59E0B" stroke="#B45309" stroke-width="2"/>
+  <circle cx="100" cy="10" r="8" fill="#FBBF24"/>
+  <!-- Traditional red border cloth -->
+  <path d="M 50 78 Q 100 88 150 78" stroke="#DC2626" stroke-width="5" fill="none"/>
+</svg>
