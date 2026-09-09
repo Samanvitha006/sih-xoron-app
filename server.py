@@ -7,6 +7,7 @@ Team: Invincible Core
 import os
 import json
 import sqlite3
+import base64
 from datetime import datetime
 from typing import Optional, List
 from fastapi import FastAPI, Request, HTTPException
@@ -33,6 +34,7 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 os.makedirs(os.path.join(STATIC_DIR, "css"), exist_ok=True)
 os.makedirs(os.path.join(STATIC_DIR, "js"), exist_ok=True)
 os.makedirs(os.path.join(STATIC_DIR, "assets", "photos"), exist_ok=True)
+os.makedirs(os.path.join(STATIC_DIR, "assets", "photos", "uploads"), exist_ok=True)
 os.makedirs(os.path.join(STATIC_DIR, "assets", "audio"), exist_ok=True)
 
 # Mount static files
@@ -122,6 +124,8 @@ class FamilyMemberCreateRequest(BaseModel):
     visit_schedule: str
     shared_memory: str
     photo_svg_tag: Optional[str] = "custom_member"
+    photo_url: Optional[str] = None
+    photo_base64: Optional[str] = None
 
 class ReminderCreateRequest(BaseModel):
     patient_id: str = "pat-ner-001"
@@ -200,6 +204,32 @@ def create_memory_bank_member(req: FamilyMemberCreateRequest):
     conn = get_db_connection()
     cursor = conn.cursor()
     mem_id = f"mem-{datetime.now().strftime('%m%d%H%M%S')}"
+    
+    photo_url = req.photo_url or "/static/assets/photos/custom_member.svg"
+
+    # Process base64 photo upload if provided
+    if req.photo_base64 and len(req.photo_base64) > 50:
+        try:
+            b64_data = req.photo_base64
+            ext = "png"
+            if "," in b64_data:
+                header, b64_data = b64_data.split(",", 1)
+                if "jpeg" in header or "jpg" in header:
+                    ext = "jpg"
+                elif "webp" in header:
+                    ext = "webp"
+            
+            img_bytes = base64.b64decode(b64_data)
+            upload_dir = os.path.join(STATIC_DIR, "assets", "photos", "uploads")
+            os.makedirs(upload_dir, exist_ok=True)
+            filename = f"upload_{mem_id}.{ext}"
+            file_path = os.path.join(upload_dir, filename)
+            with open(file_path, "wb") as f:
+                f.write(img_bytes)
+            photo_url = f"/static/assets/photos/uploads/{filename}"
+        except Exception as e:
+            print("[Upload] Error saving family member photo:", e)
+
     cursor.execute("""
     INSERT INTO memory_bank (
         id, patient_id, name, relationship, relationship_as, relationship_bn,
@@ -208,12 +238,17 @@ def create_memory_bank_member(req: FamilyMemberCreateRequest):
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 0, ?)
     """, (
         mem_id, req.patient_id, req.name, req.relationship, req.relationship, req.relationship,
-        req.photo_svg_tag, "/static/assets/photos/custom_member.svg", req.voice_note_text,
+        req.photo_svg_tag, photo_url, req.voice_note_text,
         req.location, req.visit_schedule, req.shared_memory, datetime.now().isoformat()
     ))
     conn.commit()
     conn.close()
-    return {"status": "success", "id": mem_id, "message": "Family member added to Living Memory Bank"}
+    return {
+        "status": "success",
+        "id": mem_id,
+        "photo_url": photo_url,
+        "message": "Family member added to Living Memory Bank"
+    }
 
 # 3. Reminiscence Stories Endpoints
 @app.get("/api/stories/{patient_id}")

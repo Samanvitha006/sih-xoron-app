@@ -440,8 +440,29 @@
           <span>➕</span> <span data-i18n="cgAddFamilyMember">Add Member to Living Memory Bank</span>
         </h3>
         <p class="text-xs text-gray-600 mb-4">
-          Upload 1 photo and voice note. XORON's on-device intelligence identifies them across family albums and sets up gentle voice recall.
+          Upload a genuine portrait photo and voice note. XORON automatically includes them across Living Memory Bank cards, "Who is This?" games, and companion guidance.
         </p>
+
+        <!-- Photo Upload Box with Live Circular Preview -->
+        <div class="mb-5 p-4 rounded-2xl bg-amber-50/70 border-2 border-dashed border-amber-300 flex flex-col sm:flex-row items-center gap-5">
+          <div class="relative w-24 h-24 rounded-full overflow-hidden bg-white border-2 border-amber-400 shadow-sm flex-shrink-0 flex items-center justify-center">
+            <img id="new-mem-photo-preview" src="/static/assets/photos/custom_member.svg" alt="Preview" class="w-full h-full object-cover">
+          </div>
+          <div class="flex-1 text-center sm:text-left">
+            <div class="font-bold text-sm text-amber-950 mb-1">📸 Upload Living Member Photo</div>
+            <p class="text-xs text-amber-800 mb-2">Choose a clear face portrait (JPG, PNG, WebP) from your files or take a photo.</p>
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+              <label for="new-mem-photo-input" class="cursor-pointer px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-1.5">
+                <span>📁</span> <span>Choose Photo</span>
+              </label>
+              <input type="file" id="new-mem-photo-input" accept="image/*" class="hidden" onchange="window.caregiver.previewFamilyPhoto(event)">
+              <button type="button" id="new-mem-photo-clear" onclick="window.caregiver.clearFamilyPhoto()" class="hidden px-3 py-2 bg-white border border-gray-300 text-gray-700 rounded-xl text-xs font-semibold hover:bg-gray-50">
+                ✕ Remove
+              </button>
+            </div>
+            <div id="new-mem-photo-name" class="text-[11px] text-emerald-800 font-semibold mt-1.5 hidden"></div>
+          </div>
+        </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>

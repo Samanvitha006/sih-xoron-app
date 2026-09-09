@@ -283,25 +283,37 @@ class ReminiscenceTherapy {
     const lang = window.I18N ? window.I18N.currentLang : 'en';
     const correctRel = member[`relationship_${lang}`] || member.relationship;
 
-    // Generate 2 distractors from other members
+    const diffCfg = window.adaptiveEngine ? window.adaptiveEngine.getDifficultyConfig() : { choiceCount: 2 };
+    const numChoices = Math.min(4, Math.max(2, diffCfg.choiceCount));
+
+    // Generate distractors from other members or cultural familial relations
     const otherMembers = this.familyMembers.filter((_, i) => i !== this.currentMemberIndex);
-    const distractor1 = otherMembers[0] ? (otherMembers[0][`relationship_${lang}`] || otherMembers[0].relationship) : (lang === 'as' ? "ভতিজা" : "Nephew");
-    const distractor2 = otherMembers[1] ? (otherMembers[1][`relationship_${lang}`] || otherMembers[1].relationship) : (lang === 'as' ? "বান্ধৱী" : "Friend");
+    const candidateDistractors = [
+      otherMembers[0] ? `${otherMembers[0].name} (${otherMembers[0][`relationship_${lang}`] || otherMembers[0].relationship})` : (lang === 'as' ? "ভতিজা (Nephew)" : "Nephew"),
+      otherMembers[1] ? `${otherMembers[1].name} (${otherMembers[1][`relationship_${lang}`] || otherMembers[1].relationship})` : (lang === 'as' ? "বান্ধৱী (Friend)" : "Dear Friend"),
+      otherMembers[2] ? `${otherMembers[2].name} (${otherMembers[2][`relationship_${lang}`] || otherMembers[2].relationship})` : (lang === 'as' ? "মৰমৰ খুৰা (Uncle)" : "Loving Uncle")
+    ];
 
     const options = [
-      { text: `${member.name} (${correctRel})`, isCorrect: true },
-      { text: distractor1, isCorrect: false }
+      { text: `${member.name} (${correctRel})`, isCorrect: true }
     ];
-    if (options.length === 2 && distractor2) {
-      options.push({ text: distractor2, isCorrect: false });
+
+    for (let d = 0; d < numChoices - 1 && d < candidateDistractors.length; d++) {
+      options.push({ text: candidateDistractors[d], isCorrect: false });
     }
+
     // Shuffle options
     options.sort(() => Math.random() - 0.5);
 
+    const diffHeaderHtml = window.adaptiveEngine ? window.adaptiveEngine.renderDifficultyHeader() : '';
+
     modalContent.innerHTML = `
       <div class="text-center p-4 max-w-xl mx-auto">
-        <div class="inline-block bg-amber-100 text-amber-900 text-sm font-extrabold px-4 py-1.5 rounded-full mb-3">
-          ${lang === 'as' ? 'কোনে এইজন? • পাৰিবাৰিক মুখ চিনি পোৱা' : 'Who is This? • Family Memory Recall'}
+        ${diffHeaderHtml}
+        <div>
+          <div class="inline-block bg-amber-100 text-amber-900 text-sm font-extrabold px-4 py-1.5 rounded-full mb-3">
+            ${lang === 'as' ? 'কোনে এইজন? • পাৰিবাৰিক মুখ চিনি পোৱা' : 'Who is This? • Family Memory Recall'}
+          </div>
         </div>
         
         <div class="relative w-48 h-48 mx-auto my-3 rounded-3xl overflow-hidden border-4 border-amber-300 shadow-md bg-amber-50">

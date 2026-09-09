@@ -1,6 +1,7 @@
 """
 Automated Verification Script for XORON FastAPI Server & Endpoints
 """
+import os
 from fastapi.testclient import TestClient
 import numpy as np
 from server import app
@@ -28,6 +29,27 @@ def test_xoron_endpoints():
     members = r.json()
     assert len(members) >= 4
     print(f"[PASS] Living Memory Bank: {len(members)} family members loaded")
+
+    # 3b. Add Member to Living Memory Bank with Photo Upload (Base64)
+    test_png_b64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+    r_add_mem = client.post("/api/memory-bank", json={
+        "patient_id": "pat-ner-001",
+        "name": "Dr. Subhasish Baruah",
+        "relationship": "Elder Brother",
+        "photo_svg_tag": "subhasish",
+        "photo_base64": test_png_b64,
+        "voice_note_text": "Remember Subhasish da who studied medicine in Dibrugarh",
+        "location": "Jorhat, Assam",
+        "visit_schedule": "Alternate Sundays",
+        "shared_memory": "Sitting by the Brahmaputra during autumn evenings"
+    })
+    assert r_add_mem.status_code == 200
+    add_mem_data = r_add_mem.json()
+    assert add_mem_data["status"] == "success"
+    assert "/static/assets/photos/uploads/upload_" in add_mem_data["photo_url"]
+    uploaded_rel = add_mem_data["photo_url"].lstrip("/").replace("/", os.sep)
+    assert os.path.exists(uploaded_rel), f"Uploaded file {uploaded_rel} not found on disk"
+    print(f"[PASS] POST /api/memory-bank: Member added with custom photo upload ({add_mem_data['photo_url']})")
 
     # 4. Reminiscence Stories
     r = client.get("/api/stories/pat-ner-001")

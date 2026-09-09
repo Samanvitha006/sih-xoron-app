@@ -470,7 +470,54 @@ class CaregiverCommandCentre {
     container.innerHTML = html;
   }
 
-  // --- Add New Member to Living Memory Bank ---
+  // --- Add New Member to Living Memory Bank with Real Photo Upload ---
+  previewFamilyPhoto(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert("Please select an image file (JPG, PNG, WebP).");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Please select a photo smaller than 5MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.currentUploadedPhotoBase64 = e.target.result;
+      const previewEl = document.getElementById('new-mem-photo-preview');
+      if (previewEl) previewEl.src = e.target.result;
+
+      const clearBtn = document.getElementById('new-mem-photo-clear');
+      if (clearBtn) clearBtn.classList.remove('hidden');
+
+      const nameEl = document.getElementById('new-mem-photo-name');
+      if (nameEl) {
+        nameEl.textContent = `✓ ${file.name} (${Math.round(file.size / 1024)} KB)`;
+        nameEl.classList.remove('hidden');
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  clearFamilyPhoto() {
+    this.currentUploadedPhotoBase64 = null;
+    const input = document.getElementById('new-mem-photo-input');
+    if (input) input.value = '';
+
+    const previewEl = document.getElementById('new-mem-photo-preview');
+    if (previewEl) previewEl.src = '/static/assets/photos/custom_member.svg';
+
+    const clearBtn = document.getElementById('new-mem-photo-clear');
+    if (clearBtn) clearBtn.classList.add('hidden');
+
+    const nameEl = document.getElementById('new-mem-photo-name');
+    if (nameEl) nameEl.classList.add('hidden');
+  }
+
   async addFamilyMember() {
     const name = document.getElementById('new-mem-name').value.trim();
     const relation = document.getElementById('new-mem-relation').value.trim();
@@ -489,7 +536,8 @@ class CaregiverCommandCentre {
       location: location || "Assam",
       visit_schedule: "Visits regularly",
       shared_memory: "Beloved family connection",
-      voice_note_text: voiceNote
+      voice_note_text: voiceNote,
+      photo_base64: this.currentUploadedPhotoBase64 || null
     };
 
     try {
@@ -499,8 +547,10 @@ class CaregiverCommandCentre {
         body: JSON.stringify(payload)
       });
       if (resp.ok) {
-        alert(`Successfully added ${name} to Living Memory Bank!`);
-        // Reload reminiscence data
+        const data = await resp.json();
+        alert(`🌸 Successfully added ${name} with portrait photo to Living Memory Bank!`);
+        
+        // Reload reminiscence data so the real photo is live everywhere
         if (window.reminiscence) {
           await window.reminiscence.loadData();
           window.reminiscence.renderStoryVault('reminiscence-vault-container');
@@ -509,6 +559,7 @@ class CaregiverCommandCentre {
         document.getElementById('new-mem-relation').value = '';
         document.getElementById('new-mem-location').value = '';
         document.getElementById('new-mem-voice').value = '';
+        this.clearFamilyPhoto();
       }
     } catch (e) {
       alert("Added locally in offline storage.");
