@@ -261,13 +261,17 @@ class MemoryChatbot {
 
     if (data.card_type === 'family_card' && data.card_data) {
       const d = data.card_data;
+      const memKey = d.name.toLowerCase().includes('priya') ? 'priya'
+        : (d.name.toLowerCase().includes('rohan') ? 'rohan'
+        : (d.name.toLowerCase().includes('biren') ? 'biren'
+        : (d.name.toLowerCase().includes('anjali') ? 'anjali' : 'sathi')));
       cardHtml = `
         <div class="mt-3 p-3 bg-white rounded-2xl border-2 border-emerald-200 shadow-sm flex items-center gap-3">
           <img src="${d.photo_url}" alt="${d.name}" class="w-16 h-16 rounded-full object-cover border border-emerald-300">
           <div>
             <div class="font-bold text-gray-800 text-base">${d.name} (${d.relationship})</div>
             <div class="text-xs text-gray-600">${d.schedule}</div>
-            <button onclick="window.speechEngine.speak('${d.voice_note.replace(/'/g, "\\'")}')" class="mt-1.5 px-3 py-1 bg-emerald-100 text-emerald-900 rounded-lg text-xs font-bold flex items-center gap-1">
+            <button onclick="window.speechEngine.speakWithCartesia('${d.voice_note.replace(/'/g, "\\'")}', '${memKey}')" class="mt-1.5 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 rounded-lg text-xs font-bold flex items-center gap-1 transition">
               <span>🔊</span> <span>${lang === 'as' ? 'বাৰ্তা শুনক' : 'Play Voice Clip'}</span>
             </button>
           </div>

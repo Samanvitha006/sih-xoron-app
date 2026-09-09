@@ -12,8 +12,11 @@ class SpeechEngine {
     this.recognition = null;
     this.isListening = false;
     this.audioCtx = null;
+    this.activeSource = null;
+    this.activeAudio = null;
     this.initAudioContext();
     this.initRecognition();
+    this.bindAutoUnlock();
   }
 
   initAudioContext() {
@@ -42,19 +45,41 @@ class SpeechEngine {
     }
   }
 
-  speak(text, lang = null, onEndCallback = null) {
+  bindAutoUnlock() {
+    const unlock = () => {
+      this.ensureAudioContext();
+    };
+    ['click', 'touchstart', 'keydown'].forEach(evt => {
+      document.addEventListener(evt, unlock, { passive: true });
+    });
+  }
+
+  stop() {
+    if (this.activeSource) {
+      try { this.activeSource.stop(); } catch (e) {}
+      this.activeSource = null;
+    }
+    if (this.activeAudio) {
+      try { this.activeAudio.pause(); this.activeAudio.currentTime = 0; } catch (e) {}
+      this.activeAudio = null;
+    }
+    if (this.synth) {
+      try { this.synth.cancel(); } catch (e) {}
+    }
+  }
+
+  speakWebSpeech(text, lang = null, onEndCallback = null) {
     if (!this.synth) return;
     this.synth.cancel(); // Stop any pending speech
 
     const activeLang = lang || (window.I18N ? window.I18N.currentLang : 'en');
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.4; // Gentle pacing for elderly comprehension (calibrated with VoiceCompanion Tts 0.4x)
+    utterance.rate = 0.4; // Gentle pacing for elderly comprehension
     utterance.pitch = 1.0;
 
-    // Map language codes to available browser voices
     const langMap = {
       'en': 'en-IN',
-      'as': 'bn-IN', // Assamese fallback to bn-IN if direct as-IN voice is absent
+      'as': 'bn-IN',
       'bn': 'bn-IN',
       'brx': 'hi-IN',
       'mni': 'bn-IN',
@@ -63,7 +88,6 @@ class SpeechEngine {
 
     utterance.lang = langMap[activeLang] || 'en-IN';
 
-    // Pick best matching voice
     const voices = this.synth.getVoices();
     const voice = voices.find(v => v.lang.startsWith(utterance.lang.substring(0, 2))) ||
                   voices.find(v => v.lang.includes('IN')) ||
@@ -79,35 +103,80 @@ class SpeechEngine {
     this.synth.speak(utterance);
   }
 
+  async speak(text, lang = null, onEndCallback = null, memberKey = 'sathi') {
+    // Default speech in XORON attempts Cartesia familial voice first, with Web Speech fallback
+    return await this.speakWithCartesia(text, memberKey, null, onEndCallback);
+  }
+
   async speakWithCartesia(transcript, memberId = null, voiceId = null, onEndCallback = null) {
+    this.stop();
+    this.ensureAudioContext();
     const activeLang = window.I18N ? window.I18N.currentLang : 'en';
+
+    console.log(`[SpeechEngine] 🎙️ Synthesizing via Cartesia: persona=${memberId || 'sathi'}, lang=${activeLang}`);
+
     try {
       const resp = await fetch('/api/tts/cartesia/speak', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           transcript: transcript,
-          member_id: memberId,
+          member_id: memberId || 'sathi',
           voice_id: voiceId,
           language: activeLang
         })
       });
 
       if (resp.ok) {
-        const blob = await resp.blob();
-        const audioUrl = URL.createObjectURL(blob);
-        const audio = new Audio(audioUrl);
-        audio.playbackRate = 0.92; // Natural and gentle
-        if (onEndCallback) audio.onended = onEndCallback;
-        await audio.play();
-        return true;
+        const arrayBuffer = await resp.arrayBuffer();
+        console.log(`[SpeechEngine] Cartesia audio received: ${arrayBuffer.byteLength} bytes. Decoding...`);
+
+        // Use Web Audio API decodeAudioData: immune to browser autoplay gesture timeouts!
+        this.ensureAudioContext();
+        if (this.audioCtx) {
+          const audioBuffer = await new Promise((resolve, reject) => {
+            this.audioCtx.decodeAudioData(arrayBuffer.slice(0), resolve, reject);
+          });
+
+          const source = this.audioCtx.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(this.audioCtx.destination);
+          this.activeSource = source;
+
+          source.onended = () => {
+            this.activeSource = null;
+            console.log("[SpeechEngine] Cartesia voice playback finished.");
+            if (onEndCallback) onEndCallback();
+          };
+
+          source.start(0);
+          console.log("[SpeechEngine] ▶️ Playing Cartesia cloned voice via Web Audio!");
+          return true;
+        } else {
+          // Fallback to HTML5 Audio Element
+          const blob = new Blob([arrayBuffer], { type: 'audio/wav' });
+          const audioUrl = URL.createObjectURL(blob);
+          const audio = new Audio(audioUrl);
+          this.activeAudio = audio;
+          audio.onended = () => {
+            this.activeAudio = null;
+            URL.revokeObjectURL(audioUrl);
+            if (onEndCallback) onEndCallback();
+          };
+          await audio.play();
+          return true;
+        }
+      } else {
+        const err = await resp.text();
+        console.warn(`[SpeechEngine] Cartesia returned ${resp.status}:`, err);
       }
     } catch (e) {
-      console.warn("Cartesia synthesis not available, falling back to Web Speech", e);
+      console.warn("[SpeechEngine] Cartesia audio playback error, falling back to Web Speech:", e);
     }
 
-    // Fallback to calibrated elderly Web Speech
-    this.speak(transcript, activeLang, onEndCallback);
+    // Graceful fallback to calibrated elderly Web Speech
+    console.log("[SpeechEngine] Falling back to Web Speech API");
+    this.speakWebSpeech(transcript, activeLang, onEndCallback);
     return false;
   }
 

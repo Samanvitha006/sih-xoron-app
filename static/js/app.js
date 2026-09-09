@@ -104,6 +104,8 @@ class XoronApp {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/static/sw.js').then(reg => {
           console.log("XORON Offline Service Worker active:", reg.scope);
+          // Check for immediate updates
+          reg.update();
         }).catch(err => {
           console.log("Service Worker registration skipped:", err);
         });

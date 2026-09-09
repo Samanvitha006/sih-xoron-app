@@ -3,7 +3,7 @@
  * Ensures full caching of UI, audio synthesis, SVG assets, and cognitive games for rural NER.
  */
 
-const CACHE_NAME = 'xoron-v1';
+const CACHE_NAME = 'xoron-v5';
 const OFFLINE_URLS = [
   '/',
   '/static/css/style.css',
@@ -33,12 +33,12 @@ const OFFLINE_URLS = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(OFFLINE_URLS);
     })
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -47,6 +47,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('[SW] Deleting stale cache:', key);
             return caches.delete(key);
           }
         })
@@ -57,7 +58,7 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network first for API, cache first for static assets
+  // Always fetch fresh API responses
   if (event.request.url.includes('/api/')) {
     event.respondWith(
       fetch(event.request).catch(() => {
@@ -67,10 +68,19 @@ self.addEventListener('fetch', (event) => {
       })
     );
   } else {
+    // Network-first for static code so updates load immediately; fallback to cache if offline
     event.respondWith(
-      caches.match(event.request).then((response) => {
-        return response || fetch(event.request);
-      })
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return response;
+        })
+        .catch(() => {
+          return caches.match(event.request);
+        })
     );
   }
 });

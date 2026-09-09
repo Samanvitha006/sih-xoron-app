@@ -239,11 +239,9 @@ class ReminiscenceTherapy {
       const memberKey = member.name.toLowerCase().includes('priya') ? 'priya'
         : (member.name.toLowerCase().includes('rohan') ? 'rohan'
         : (member.name.toLowerCase().includes('biren') ? 'biren'
-        : (member.name.toLowerCase().includes('anjali') ? 'anjali' : null)));
+        : (member.name.toLowerCase().includes('anjali') ? 'anjali' : 'sathi')));
 
-      setTimeout(() => {
-        window.speechEngine.speakWithCartesia(announcement, memberKey);
-      }, 400);
+      window.speechEngine.speakWithCartesia(announcement, memberKey);
     }
   }
 
@@ -255,10 +253,7 @@ class ReminiscenceTherapy {
     const textToSpeak = (lang === 'as' && story.narrative_as) ? story.narrative_as : story.narrative;
 
     if (window.speechEngine) {
-      window.speechEngine.playGentleChime('hint');
-      setTimeout(() => {
-        window.speechEngine.speakWithCartesia(textToSpeak, 'sathi');
-      }, 500);
+      window.speechEngine.speakWithCartesia(textToSpeak, 'sathi');
     }
   }
 
