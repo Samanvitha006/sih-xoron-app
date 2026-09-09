@@ -105,6 +105,17 @@ Instant 1-tap language switching across all features, audio synthesis, and voice
 ### 10. Android Home-Screen Widget Simulator
 - Interactive preview of the single-tap Android widget: speaks first, displays daily orientation, upcoming medicine countdown, and 1-tap game launch with no confusing menus.
 
+### 11. Strict Tiered Rate Limiting & Anti-Abuse Protection
+- **Thread-Safe Sliding-Window Limiter ([`rate_limiter.py`](file:///C:/Users/Dell/.gemini/antigravity/scratch/xoron/rate_limiter.py))**: Protects all API endpoints from abusive traffic, rapid click-spam, and Cartesia TTS quota exhaustion.
+- **Granular Endpoint Tiers**:
+  - **Cartesia Voice Synthesis (`/api/tts/cartesia/speak`)**: 10 req/min (Burst limit: 3 req / 10s).
+  - **AI Memory Chatbot (`/api/chat/*`)**: 15 req/min (Burst limit: 4 req / 10s).
+  - **Edge AI DNF & Mutations (`POST /api/*`)**: 30 req/min (Burst limit: 8 req / 10s).
+  - **General REST Reads (`GET /api/*`)**: 60 req/min (Burst limit: 20 req / 10s).
+- **Reverse-Proxy Aware**: Automatically inspects `CF-Connecting-IP` (Cloudflare Tunnel), `X-Forwarded-For`, and direct client socket IP.
+- **RFC-Compliant HTTP 429**: Returns `Retry-After`, `X-RateLimit-Limit`, and `X-RateLimit-Remaining` headers.
+- **Live Client Quota Inspection**: `GET /api/ratelimit/status` returns remaining requests and reset windows in real-time.
+
 ---
 
 ## How to Run the Project
@@ -145,11 +156,11 @@ xoron/
 ├── models.js                   # WatermelonDB Model Classes & Decorators
 ├── VoiceCompanion.js           # React Native Voice Companion Component (@react-native-voice & tts)
 ├── cartesia_service.py         # Cartesia Sonic TTS & Familial Voice Cloning Service
-├── cartesia_config.json        # Runtime Cartesia API Key & Voice ID mapping store
-├── server.py                   # FastAPI REST & Static File Server (telemetry, qdrs, schedules, dnf, tts)
+├── rate_limiter.py             # Strict Sliding-Window Rate Limiter & Token Bucket
+├── server.py                   # FastAPI REST & Static File Server (telemetry, qdrs, schedules, dnf, tts, ratelimit)
 ├── database.py                 # SQLite Offline-First Store & Clinical Biomarker Seed Data
 ├── chatbot.py                  # LangChain PromptTemplate RAG & Validation Therapy Engine
-├── test_server.py              # Automated 17-Point Verification Test Suite
+├── test_server.py              # Automated 18-Point Verification Test Suite
 ├── create_assets.py            # Authentic SVG asset generator
 ├── start_app.bat               # 1-Click Windows launcher for judges & caregivers
 ├── README.md                   # Complete SIH 2026 Project Documentation

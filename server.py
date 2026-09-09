@@ -18,6 +18,7 @@ from database import get_db_connection, init_db
 from chatbot import assistant
 from dnf_engine import calculate_dnf, evaluate_patient_dnf, normalize_features
 from cartesia_service import cartesia_service
+from rate_limiter import rate_limiter
 
 app = FastAPI(
     title="XORON - Cognitive Care in the Language of Home",
@@ -36,6 +37,51 @@ os.makedirs(os.path.join(STATIC_DIR, "assets", "audio"), exist_ok=True)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+def get_client_ip(request: Request) -> str:
+    cf_ip = request.headers.get("cf-connecting-ip")
+    if cf_ip:
+        return cf_ip.strip()
+    xff = request.headers.get("x-forwarded-for")
+    if xff:
+        return xff.split(",")[0].strip()
+    if request.client:
+        return request.client.host
+    return "127.0.0.1"
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    # Strictly enforce rate limiting across all API endpoints
+    if request.url.path.startswith("/api/"):
+        client_ip = get_client_ip(request)
+        allowed, retry_after, remaining, limit, desc = rate_limiter.check(
+            client_ip=client_ip,
+            path=request.url.path,
+            method=request.method
+        )
+        if not allowed:
+            return JSONResponse(
+                status_code=429,
+                content={
+                    "error": "Too Many Requests",
+                    "detail": f"Strict rate limit exceeded for {desc}. Please retry in {retry_after}s.",
+                    "retry_after": retry_after,
+                    "limit": limit
+                },
+                headers={
+                    "Retry-After": str(retry_after),
+                    "X-RateLimit-Limit": str(limit),
+                    "X-RateLimit-Remaining": "0",
+                    "X-RateLimit-Reset": str(retry_after)
+                }
+            )
+
+        response = await call_next(request)
+        response.headers["X-RateLimit-Limit"] = str(limit)
+        response.headers["X-RateLimit-Remaining"] = str(remaining)
+        return response
+
+    return await call_next(request)
 
 @app.middleware("http")
 async def add_no_cache_header(request: Request, call_next):
@@ -506,6 +552,15 @@ def generate_cartesia_tts(req: CartesiaSpeakRequest):
             detail="Cartesia audio synthesis unavailable. API key may not be set or voice ID invalid."
         )
     return Response(content=audio_bytes, media_type="audio/wav")
+
+# 14. Rate Limiter Status Endpoint
+@app.get("/api/ratelimit/status")
+def get_rate_limit_status(request: Request):
+    client_ip = get_client_ip(request)
+    return {
+        "client_ip": client_ip,
+        "status": rate_limiter.get_client_status(client_ip)
+    }
 
 if __name__ == "__main__":
     import uvicorn

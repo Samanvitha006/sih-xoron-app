@@ -166,6 +166,9 @@ class SpeechEngine {
           await audio.play();
           return true;
         }
+      } else if (resp.status === 429) {
+        console.warn("[SpeechEngine] ⏳ Cartesia rate limit reached (HTTP 429). Preventing rapid spam.");
+        return false;
       } else {
         const err = await resp.text();
         console.warn(`[SpeechEngine] Cartesia returned ${resp.status}:`, err);

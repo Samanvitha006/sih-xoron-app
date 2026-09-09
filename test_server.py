@@ -182,6 +182,36 @@ def test_xoron_endpoints():
     assert r_cart_speak.status_code in [200, 400]
     print(f"[PASS] POST /api/tts/cartesia/speak: Handled with status {r_cart_speak.status_code} (Graceful fallback active)")
 
+    # 18. Strict Rate Limiting Verification
+    # Check rate limit headers present
+    assert "x-ratelimit-limit" in r_cart_speak.headers
+    assert "x-ratelimit-remaining" in r_cart_speak.headers
+
+    # Rate limit status endpoint
+    r_rl_status = client.get("/api/ratelimit/status")
+    assert r_rl_status.status_code == 200
+    rl_data = r_rl_status.json()
+    assert "status" in rl_data
+    assert "tts" in rl_data["status"]
+    print(f"[PASS] GET /api/ratelimit/status: Rate limit status retrieved for {rl_data['client_ip']}")
+
+    # Verify 429 Too Many Requests enforcement under burst
+    test_burst_ip = "192.168.99.99"
+    got_429 = False
+    for _ in range(6):
+        r_burst = client.post(
+            "/api/tts/cartesia/speak",
+            json={"transcript": "Test", "member_id": "priya"},
+            headers={"x-forwarded-for": test_burst_ip}
+        )
+        if r_burst.status_code == 429:
+            got_429 = True
+            assert "retry-after" in r_burst.headers
+            assert "Strict rate limit exceeded" in r_burst.json()["detail"]
+            print(f"[PASS] Rate Limiter Enforcement: HTTP 429 returned as expected (Retry-After: {r_burst.headers['retry-after']}s)")
+            break
+    assert got_429, "Rate limiter failed to trigger 429 under burst!"
+
     print("\nALL TESTS PASSED! XORON is fully verified and functional.")
 
 if __name__ == "__main__":

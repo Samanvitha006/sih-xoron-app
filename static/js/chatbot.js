@@ -119,6 +119,11 @@ class MemoryChatbot {
         if (window.speechEngine && data.reply_text) {
           window.speechEngine.speakWithCartesia(data.reply_text, 'sathi');
         }
+      } else if (resp.status === 429) {
+        const errData = await resp.json().catch(() => ({}));
+        this.renderBotResponse({
+          reply_text: `⏳ ${errData.detail || 'Rate limit reached. Please wait a few seconds before asking another question.'}`
+        });
       } else {
         this.renderBotResponse({
           reply_text: lang === 'as' 
