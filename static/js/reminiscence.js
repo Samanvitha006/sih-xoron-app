@@ -236,8 +236,13 @@ class ReminiscenceTherapy {
         ? `এয়া আপোনাৰ মৰমৰ ${rel}, ${member.name}। ${member.voice_note_text}`
         : `This is your loving ${rel}, ${member.name}. ${member.voice_note_text}`;
       
+      const memberKey = member.name.toLowerCase().includes('priya') ? 'priya'
+        : (member.name.toLowerCase().includes('rohan') ? 'rohan'
+        : (member.name.toLowerCase().includes('biren') ? 'biren'
+        : (member.name.toLowerCase().includes('anjali') ? 'anjali' : null)));
+
       setTimeout(() => {
-        window.speechEngine.speak(announcement);
+        window.speechEngine.speakWithCartesia(announcement, memberKey);
       }, 400);
     }
   }
@@ -252,7 +257,7 @@ class ReminiscenceTherapy {
     if (window.speechEngine) {
       window.speechEngine.playGentleChime('hint');
       setTimeout(() => {
-        window.speechEngine.speak(textToSpeak);
+        window.speechEngine.speakWithCartesia(textToSpeak, 'sathi');
       }, 500);
     }
   }

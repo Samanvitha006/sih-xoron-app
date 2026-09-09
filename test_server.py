@@ -156,7 +156,34 @@ def test_xoron_endpoints():
     assert "Stage A" in pred_data["classified_stage"]
     print(f"[PASS] POST /api/dnf/predict: Healthy Stage={pred_data['classified_stage']} (Confidence: {pred_data['confidence_pct']}%)")
 
+    # 17. Cartesia Sonic Voice Synthesis & Config Endpoints
+    r_cart_cfg = client.get("/api/tts/cartesia/config")
+    assert r_cart_cfg.status_code == 200
+    cart_cfg_data = r_cart_cfg.json()
+    assert "voice_ids" in cart_cfg_data
+    assert "priya" in cart_cfg_data["voice_ids"]
+    assert "rohan" in cart_cfg_data["voice_ids"]
+    print(f"[PASS] GET /api/tts/cartesia/config: Config retrieved (Configured={cart_cfg_data['is_configured']}, Voices={len(cart_cfg_data['voice_ids'])})")
+
+    # Update Cartesia voice mapping
+    r_cart_update = client.post("/api/tts/cartesia/config", json={
+        "voice_ids": {"priya": "fb26447f-308b-471e-8b00-8e9f04284eb5"}
+    })
+    assert r_cart_update.status_code == 200
+    assert r_cart_update.json()["status"] == "success"
+    print("[PASS] POST /api/tts/cartesia/config: Voice configuration updated successfully")
+
+    # Speak endpoint (without key returns 400 graceful fallback flag)
+    r_cart_speak = client.post("/api/tts/cartesia/speak", json={
+        "transcript": "Hello Aita, I love you",
+        "member_id": "priya"
+    })
+    # If unconfigured, expect 400 fallback
+    assert r_cart_speak.status_code in [200, 400]
+    print(f"[PASS] POST /api/tts/cartesia/speak: Handled with status {r_cart_speak.status_code} (Graceful fallback active)")
+
     print("\nALL TESTS PASSED! XORON is fully verified and functional.")
 
 if __name__ == "__main__":
     test_xoron_endpoints()
+

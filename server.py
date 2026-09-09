@@ -10,13 +10,14 @@ import sqlite3
 from datetime import datetime
 from typing import Optional, List
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from database import get_db_connection, init_db
 from chatbot import assistant
 from dnf_engine import calculate_dnf, evaluate_patient_dnf, normalize_features
+from cartesia_service import cartesia_service
 
 app = FastAPI(
     title="XORON - Cognitive Care in the Language of Home",
@@ -95,6 +96,16 @@ class DnfPredictRequest(BaseModel):
     kinematics: List[float] # Pressure, stroke velocity, drag jitter, air-hesitation
     oculomotor: List[float] # Saccade velocity, blink frequency
     demographics: List[float] # Age, education modifier
+
+class CartesiaSpeakRequest(BaseModel):
+    transcript: str
+    voice_id: Optional[str] = None
+    member_id: Optional[str] = None
+    language: str = "en"
+
+class CartesiaConfigRequest(BaseModel):
+    api_key: Optional[str] = None
+    voice_ids: Optional[dict] = None
 
 @app.on_event("startup")
 def startup_event():
@@ -461,6 +472,31 @@ def predict_dnf(req: DnfPredictRequest):
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+# 13. Cartesia Sonic Voice Synthesis & Family Voice Cloning Endpoints
+@app.get("/api/tts/cartesia/config")
+def get_cartesia_config():
+    return cartesia_service.get_status()
+
+@app.post("/api/tts/cartesia/config")
+def update_cartesia_config(req: CartesiaConfigRequest):
+    status = cartesia_service.update_config(api_key=req.api_key, voice_ids=req.voice_ids)
+    return {"status": "success", "config": status}
+
+@app.post("/api/tts/cartesia/speak")
+def generate_cartesia_tts(req: CartesiaSpeakRequest):
+    audio_bytes = cartesia_service.generate_speech(
+        transcript=req.transcript,
+        voice_id=req.voice_id,
+        member_id=req.member_id,
+        language=req.language
+    )
+    if not audio_bytes:
+        raise HTTPException(
+            status_code=400,
+            detail="Cartesia audio synthesis unavailable. API key may not be set or voice ID invalid."
+        )
+    return Response(content=audio_bytes, media_type="audio/wav")
 
 if __name__ == "__main__":
     import uvicorn

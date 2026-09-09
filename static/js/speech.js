@@ -79,6 +79,38 @@ class SpeechEngine {
     this.synth.speak(utterance);
   }
 
+  async speakWithCartesia(transcript, memberId = null, voiceId = null, onEndCallback = null) {
+    const activeLang = window.I18N ? window.I18N.currentLang : 'en';
+    try {
+      const resp = await fetch('/api/tts/cartesia/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transcript: transcript,
+          member_id: memberId,
+          voice_id: voiceId,
+          language: activeLang
+        })
+      });
+
+      if (resp.ok) {
+        const blob = await resp.blob();
+        const audioUrl = URL.createObjectURL(blob);
+        const audio = new Audio(audioUrl);
+        audio.playbackRate = 0.92; // Natural and gentle
+        if (onEndCallback) audio.onended = onEndCallback;
+        await audio.play();
+        return true;
+      }
+    } catch (e) {
+      console.warn("Cartesia synthesis not available, falling back to Web Speech", e);
+    }
+
+    // Fallback to calibrated elderly Web Speech
+    this.speak(transcript, activeLang, onEndCallback);
+    return false;
+  }
+
   startListening(onResult, onStatusChange) {
     if (!this.recognition) {
       alert("Speech recognition is not supported in this browser. Please use Google Chrome or Microsoft Edge.");

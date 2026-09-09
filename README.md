@@ -91,7 +91,18 @@ Instant 1-tap language switching across all features, audio synthesis, and voice
 - **LASI-Compliant Clinical Assessment Export**: Printable PDF report for neurologists and geriatricians.
 - **ASHA Village Cohort View**: Multi-patient dashboard flagging sustained cognitive decline or missed medication for early intervention.
 
-### 9. Android Home-Screen Widget Simulator
+### 9. Cartesia Sonic TTS & Familial Voice Cloning
+- **Ultra-Low Latency Voice Synthesis**: Integrated with Cartesia's Sonic-3.6 and Sonic Multilingual neural models for lifelike, empathetic speech.
+- **Familial Voice Cloning Vault**: Dedicated voice IDs for key family members and the AI companion:
+  - `Dr. Priya Baruah (Daughter)`: Warm, reassuring medical professional tone.
+  - `Rohan Baruah (Grandson)`: Bright, encouraging youthful timbre.
+  - `Anjali Baruah (Caregiver)`: Calm, patient daily grounding voice.
+  - `Late Biren Baruah (Husband)`: Deep nostalgic tone for emotional anchoring.
+  - `Xoron Sathi (Memory Companion)`: Empathetic AI guidance.
+- **Caregiver Voice Studio**: Accessible in the Caregiver Command Centre to enter/update Cartesia API keys, test voice output, and customize voice IDs dynamically.
+- **Zero-Crash Web Speech Fallback**: If Cartesia is offline or API key is unconfigured, the app automatically falls back to the native Web Speech API with elderly-comprehension pacing (0.4x gentle rate).
+
+### 10. Android Home-Screen Widget Simulator
 - Interactive preview of the single-tap Android widget: speaks first, displays daily orientation, upcoming medicine countdown, and 1-tap game launch with no confusing menus.
 
 ---
@@ -133,10 +144,12 @@ xoron/
 ├── schema.js                   # WatermelonDB AppSchema (patients, media, schedules, telemetry, qdrs)
 ├── models.js                   # WatermelonDB Model Classes & Decorators
 ├── VoiceCompanion.js           # React Native Voice Companion Component (@react-native-voice & tts)
-├── server.py                   # FastAPI REST & Static File Server (telemetry, qdrs, schedules, dnf)
+├── cartesia_service.py         # Cartesia Sonic TTS & Familial Voice Cloning Service
+├── cartesia_config.json        # Runtime Cartesia API Key & Voice ID mapping store
+├── server.py                   # FastAPI REST & Static File Server (telemetry, qdrs, schedules, dnf, tts)
 ├── database.py                 # SQLite Offline-First Store & Clinical Biomarker Seed Data
 ├── chatbot.py                  # LangChain PromptTemplate RAG & Validation Therapy Engine
-├── test_server.py              # Automated 16-Point Verification Test Suite
+├── test_server.py              # Automated 17-Point Verification Test Suite
 ├── create_assets.py            # Authentic SVG asset generator
 ├── start_app.bat               # 1-Click Windows launcher for judges & caregivers
 ├── README.md                   # Complete SIH 2026 Project Documentation

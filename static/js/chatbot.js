@@ -115,9 +115,9 @@ class MemoryChatbot {
         const data = await resp.json();
         this.renderBotResponse(data);
         
-        // Auto-speak response gently
+        // Auto-speak response gently with Cartesia Sonic / Web Speech fallback
         if (window.speechEngine && data.reply_text) {
-          window.speechEngine.speak(data.reply_text);
+          window.speechEngine.speakWithCartesia(data.reply_text, 'sathi');
         }
       } else {
         this.renderBotResponse({
@@ -132,7 +132,7 @@ class MemoryChatbot {
       const offlineResp = this.processOfflineQuery(query, lang);
       this.renderBotResponse(offlineResp);
       if (window.speechEngine && offlineResp.reply_text) {
-        window.speechEngine.speak(offlineResp.reply_text);
+        window.speechEngine.speakWithCartesia(offlineResp.reply_text, 'sathi');
       }
     }
   }

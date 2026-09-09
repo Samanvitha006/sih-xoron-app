@@ -134,6 +134,101 @@ class CaregiverCommandCentre {
     }
   }
 
+  async openCartesiaModal() {
+    const modal = document.getElementById('cartesia-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    await this.loadCartesiaConfig();
+  }
+
+  closeCartesiaModal() {
+    const modal = document.getElementById('cartesia-modal');
+    if (modal) modal.classList.add('hidden');
+  }
+
+  async loadCartesiaConfig() {
+    try {
+      const resp = await fetch('/api/tts/cartesia/config');
+      if (resp.ok) {
+        const cfg = await resp.json();
+        const banner = document.getElementById('cartesia-status-banner');
+        const text = document.getElementById('cartesia-status-text');
+        
+        if (cfg.is_configured) {
+          if (banner) {
+            banner.className = "p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-3";
+            const icon = banner.querySelector('span');
+            if (icon) icon.textContent = "✓";
+          }
+          if (text) text.textContent = "Cartesia Sonic Ultra-Low-Latency TTS Active! Familial Voice IDs Loaded.";
+        } else {
+          if (banner) {
+            banner.className = "p-3.5 rounded-2xl bg-amber-50 border border-amber-200 flex items-center gap-3";
+            const icon = banner.querySelector('span');
+            if (icon) icon.textContent = "⚠️";
+          }
+          if (text) text.textContent = "No API Key configured. Currently using calibrated Web Speech API fallback.";
+        }
+
+        const v = cfg.voice_ids || {};
+        if (document.getElementById('cartesia-voice-priya')) document.getElementById('cartesia-voice-priya').value = v.priya || '';
+        if (document.getElementById('cartesia-voice-rohan')) document.getElementById('cartesia-voice-rohan').value = v.rohan || '';
+        if (document.getElementById('cartesia-voice-anjali')) document.getElementById('cartesia-voice-anjali').value = v.anjali || '';
+        if (document.getElementById('cartesia-voice-biren')) document.getElementById('cartesia-voice-biren').value = v.biren || '';
+        if (document.getElementById('cartesia-voice-sathi')) document.getElementById('cartesia-voice-sathi').value = v.sathi || '';
+      }
+    } catch (e) {
+      console.warn("Could not load Cartesia config", e);
+    }
+  }
+
+  async saveCartesiaConfig() {
+    const key = document.getElementById('cartesia-api-key-input')?.value.trim();
+    const voice_ids = {
+      priya: document.getElementById('cartesia-voice-priya')?.value.trim(),
+      rohan: document.getElementById('cartesia-voice-rohan')?.value.trim(),
+      anjali: document.getElementById('cartesia-voice-anjali')?.value.trim(),
+      biren: document.getElementById('cartesia-voice-biren')?.value.trim(),
+      sathi: document.getElementById('cartesia-voice-sathi')?.value.trim(),
+    };
+
+    try {
+      const resp = await fetch('/api/tts/cartesia/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ api_key: key || undefined, voice_ids: voice_ids })
+      });
+      if (resp.ok) {
+        alert("Cartesia Voice Studio settings saved successfully!");
+        await this.loadCartesiaConfig();
+      }
+    } catch (e) {
+      alert("Failed to save settings to server.");
+    }
+  }
+
+  async testCartesiaVoice() {
+    const resultDiv = document.getElementById('cartesia-test-result');
+    if (resultDiv) {
+      resultDiv.classList.remove('hidden');
+      resultDiv.textContent = "🔊 Generating Cartesia Sonic audio sample...";
+    }
+
+    const testText = "Aita, remember our wooden boat ride on the Brahmaputra? I love you!";
+    const priyaVoiceId = document.getElementById('cartesia-voice-priya')?.value.trim();
+
+    const played = await window.speechEngine.speakWithCartesia(testText, 'priya', priyaVoiceId);
+    if (resultDiv) {
+      if (played) {
+        resultDiv.textContent = "✓ Cartesia Sonic Audio played successfully!";
+        resultDiv.className = "text-xs font-bold text-center py-1 text-emerald-700";
+      } else {
+        resultDiv.textContent = "⚠️ Cartesia API key not active yet — played via calibrated Web Speech fallback.";
+        resultDiv.className = "text-xs font-bold text-center py-1 text-amber-700";
+      }
+    }
+  }
+
   renderDnfProgression() {
     const container = document.getElementById('cg-dnf-container');
     if (!container || !this.dnfData) return;
