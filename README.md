@@ -132,6 +132,7 @@ xoron/
 ├── tflite_runtime/             # Python 3.13+ LiteRT runtime compatibility package
 ├── schema.js                   # WatermelonDB AppSchema (patients, media, schedules, telemetry, qdrs)
 ├── models.js                   # WatermelonDB Model Classes & Decorators
+├── VoiceCompanion.js           # React Native Voice Companion Component (@react-native-voice & tts)
 ├── server.py                   # FastAPI REST & Static File Server (telemetry, qdrs, schedules, dnf)
 ├── database.py                 # SQLite Offline-First Store & Clinical Biomarker Seed Data
 ├── chatbot.py                  # LangChain PromptTemplate RAG & Validation Therapy Engine

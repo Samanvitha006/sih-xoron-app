@@ -58,11 +58,13 @@ class MemoryChatbot {
     if (!window.speechEngine) return;
 
     const micBtn = document.getElementById('chat-mic-btn');
+    const micLabel = document.getElementById('chat-mic-label');
     const statusText = document.getElementById('chat-voice-status');
 
     window.speechEngine.startListening(
       (transcript) => {
         if (statusText) statusText.textContent = `"${transcript}"`;
+        if (micLabel) micLabel.textContent = "Tap to Speak";
         this.queryAssistant(transcript);
       },
       (isListening) => {
@@ -70,9 +72,15 @@ class MemoryChatbot {
         if (micBtn) {
           if (isListening) {
             micBtn.classList.add('mic-active-pulse');
-            if (statusText) statusText.textContent = window.I18N ? window.I18N.t('chatListening') : 'Listening...';
+            micBtn.classList.remove('bg-amber-600', 'hover:bg-amber-700');
+            micBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+            if (micLabel) micLabel.textContent = "Listening gently...";
+            if (statusText) statusText.textContent = "Listening gently...";
           } else {
             micBtn.classList.remove('mic-active-pulse');
+            micBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+            micBtn.classList.add('bg-amber-600', 'hover:bg-amber-700');
+            if (micLabel) micLabel.textContent = "Tap to Speak";
             if (statusText) statusText.textContent = '';
           }
         }

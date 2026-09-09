@@ -48,7 +48,7 @@ class SpeechEngine {
 
     const activeLang = lang || (window.I18N ? window.I18N.currentLang : 'en');
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.85; // Calm, unhurried tempo for dementia patients
+    utterance.rate = 0.4; // Gentle pacing for elderly comprehension (calibrated with VoiceCompanion Tts 0.4x)
     utterance.pitch = 1.0;
 
     // Map language codes to available browser voices

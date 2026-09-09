@@ -647,8 +647,8 @@
 
       <!-- Voice & Text Input Bar -->
       <div class="p-3 bg-white border-t border-gray-200 flex items-center gap-2">
-        <button id="chat-mic-btn" onclick="window.memoryChatbot.startVoiceInput()" class="w-12 h-12 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-center text-xl flex-shrink-0 shadow-sm transition active:scale-95">
-          🎙️
+        <button id="chat-mic-btn" onclick="window.memoryChatbot.startVoiceInput()" class="px-4 py-2.5 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-center gap-2 text-sm font-bold flex-shrink-0 shadow-sm transition active:scale-95">
+          <span>🎙️</span> <span id="chat-mic-label">Tap to Speak</span>
         </button>
         <div class="flex-grow relative">
           <input type="text" id="chat-input-text" onkeydown="if(event.key==='Enter') window.memoryChatbot.sendTextQuery()"
