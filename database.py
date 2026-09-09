@@ -234,6 +234,11 @@ def init_db():
             seed_reminders(cursor, "pat-ner-001")
             conn.commit()
 
+        # Ensure reminiscence photo URLs use high-definition assets
+        cursor.execute("UPDATE reminiscence_stories SET photo_url = '/static/assets/photos/tea_memory.jpg' WHERE id = 'story-002'")
+        cursor.execute("UPDATE family_media SET file_uri = '/static/assets/photos/tea_memory.jpg' WHERE id = 'fm-006'")
+        conn.commit()
+
     conn.close()
 
 def seed_sample_data(cursor):
@@ -316,7 +321,7 @@ def seed_sample_data(cursor):
         ("story-002", patient_id, "Planting the Tea Garden in Sonitpur", "তেজপুৰৰ চাহ বাগিচা আৰু সেউজীয়া স্মৃতি", "1968", "Village Life",
          "You and Biren planted fresh gardenia bushes and three rows of tender tea bushes behind your Tezpur cottage.",
          "তেজপুৰৰ ঘৰৰ পিছফালে আপুনি আৰু দেউতাই তগৰ ফুল আৰু চাহ গছপুলি ৰুইছিল। বৰষুণৰ পিছত মাটিৰ সুবাস মনত পৰে নে?",
-         "Remember how sweet the evening tea tasted?", "/static/assets/photos/tea_memory.svg", "Brahmaputra breeze and bamboo flute"),
+         "Remember how sweet the evening tea tasted?", "/static/assets/photos/tea_memory.jpg", "Brahmaputra breeze and bamboo flute"),
         ("story-003", patient_id, "Dr. Priya's Graduation Day", "জীয়াৰী প্ৰিয়াৰ ডাক্তৰী ডিগ্ৰী লাভৰ দিন", "2002", "Children",
          "When Priya received her MBBS gold medal, you tied a hand-woven Gamusa around her neck with tears of joy.",
          "প্ৰিয়াই যেতিয়া গুৱাহাটী চিকিৎসা মহাবিদ্যালয়ৰ পৰা ডিগ্ৰী লৈছিল, আপুনি আনন্দৰ চকুপানীৰে ফুলাম গামোচা পিন্ধাই আশীৰ্বাদ দিছিল।",
@@ -403,7 +408,7 @@ def seed_telemetry_and_surveys(cursor, patient_id):
         ("fm-003", patient_id, "/static/assets/photos/husband_biren.svg", "Husband (Late Biren)", None),
         ("fm-004", patient_id, "/static/assets/photos/caregiver_anjali.svg", "Caregiver (Anjali)", "/static/assets/audio/anjali_voice.wav"),
         ("fm-005", patient_id, "/static/assets/photos/bihu_memory.svg", "Rongali Bihu 1974", None),
-        ("fm-006", patient_id, "/static/assets/photos/tea_memory.svg", "Sonitpur Tea Garden", None)
+        ("fm-006", patient_id, "/static/assets/photos/tea_memory.jpg", "Sonitpur Tea Garden", None)
     ]
     cursor.executemany("""
     INSERT OR REPLACE INTO family_media (id, patient_id, file_uri, relation_tag, voice_clone_uri)

@@ -3,7 +3,7 @@
  * Ensures full caching of UI, audio synthesis, SVG assets, and cognitive games for rural NER.
  */
 
-const CACHE_NAME = 'xoron-v5';
+const CACHE_NAME = 'xoron-v6';
 const OFFLINE_URLS = [
   '/',
   '/static/css/style.css',
@@ -22,6 +22,7 @@ const OFFLINE_URLS = [
   '/static/assets/photos/caregiver_anjali.svg',
   '/static/assets/photos/bihu_memory.svg',
   '/static/assets/photos/tea_memory.svg',
+  '/static/assets/photos/tea_memory.jpg',
   '/static/assets/photos/graduation_memory.svg',
   '/static/assets/patterns/xorai.svg',
   '/static/assets/patterns/jaapi.svg',

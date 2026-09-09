@@ -85,7 +85,7 @@ class ReminiscenceTherapy {
         category: "Village Life",
         narrative: "You and Biren planted fresh gardenia bushes and three rows of tender tea bushes behind your Tezpur cottage. The smell of afternoon rain on dry Assam soil was unforgettable.",
         narrative_as: "তেজপুৰৰ ঘৰৰ পিছফালে আপুনি আৰু দেউতাই তগৰ ফুল আৰু চাহ গছপুলি ৰুইছিল। বৰষুণৰ পিছত মাটিৰ সুবাস মনত পৰে নে?",
-        photo_url: "/static/assets/photos/tea_memory.svg",
+        photo_url: "/static/assets/photos/tea_memory.jpg",
         cultural_soundtrack: "Brahmaputra breeze and bamboo flute"
       },
       {
