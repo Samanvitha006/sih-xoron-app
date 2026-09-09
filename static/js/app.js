@@ -57,12 +57,27 @@ class XoronApp {
       target.classList.remove('hidden');
     }
 
-    // Update Nav buttons
+    // Update Nav buttons (Desktop)
     document.querySelectorAll('.nav-tab-btn').forEach(btn => {
       if (btn.getAttribute('data-tab') === tabId) {
         btn.classList.add('nav-tab-active');
       } else {
         btn.classList.remove('nav-tab-active');
+      }
+    });
+
+    // Update Mobile & Tablet Bottom Navigation Buttons
+    document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+      const isTarget = btn.getAttribute('data-tab') === tabId;
+      const icon = btn.querySelector('span:first-child');
+      if (isTarget) {
+        btn.classList.remove('text-gray-500');
+        btn.classList.add('text-amber-900', 'font-black');
+        if (icon) icon.classList.add('scale-110');
+      } else {
+        btn.classList.remove('text-amber-900', 'font-black');
+        btn.classList.add('text-gray-500');
+        if (icon) icon.classList.remove('scale-110');
       }
     });
 

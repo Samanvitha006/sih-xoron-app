@@ -61,9 +61,12 @@ class CognitiveGamesSuite {
     const numChoices = Math.min(4, Math.max(2, diffCfg.choiceCount));
 
     // Real-Time System Clock: Actual Day of Week & Time of Day Period
+    const live = window.I18N ? window.I18N.getRealTimeOrientation(lang) : null;
     const now = new Date();
-    const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, ...
-    const hours = now.getHours();
+    const dayOfWeek = live ? live.dayOfWeek : now.getDay();
+    const todayName = live ? live.dayName : (now.getDay() === 3 ? (lang === 'as' ? 'বুধবাৰ' : (lang === 'bn' ? 'বুধবার' : 'Wednesday')) : 'Wednesday');
+    const periodDesc = live ? live.timePeriodText : 'A peaceful morning with gentle sunlight and warm chai';
+    const periodIcon = live ? live.periodIcon : '☀️';
 
     const dayDict = [
       { en: 'Sunday', as: 'দেওবাৰ', bn: 'রবিবার' },
@@ -74,29 +77,6 @@ class CognitiveGamesSuite {
       { en: 'Friday', as: 'শুক্ৰবাৰ', bn: 'শুক্রবার' },
       { en: 'Saturday', as: 'শনিবাৰ', bn: 'শনিবার' }
     ];
-
-    const todayObj = dayDict[dayOfWeek];
-    const todayName = lang === 'as' ? todayObj.as : (lang === 'bn' ? todayObj.bn : todayObj.en);
-
-    // Contextual Real-Time Time of Day Period
-    let periodTextEn = "A peaceful morning with gentle sunlight and warm chai";
-    let periodTextAs = "বতাহজাক শান্ত, ৰাতিপুৱাৰ চাহ খোৱাৰ সময়";
-    let periodIcon = "☀️";
-    if (hours >= 12 && hours < 16) {
-      periodTextEn = "A calm afternoon resting comfortably at home";
-      periodTextAs = "দুপৰীয়াৰ শান্ত সময়, ভাত খাই জিৰণি লোৱাৰ সময়";
-      periodIcon = "🌤️";
-    } else if (hours >= 16 && hours < 20) {
-      periodTextEn = "A soothing twilight evening with family tea";
-      periodTextAs = "গধূলিৰ সময়, পৰিয়ালৰ সৈতে চাকি জ্বলোৱা আৰু চাহ খোৱাৰ সময়";
-      periodIcon = "🌆";
-    } else if (hours >= 20 || hours < 5) {
-      periodTextEn = "Peaceful night time, safe and cozy in your warm home";
-      periodTextAs = "নিশাৰ বিশ্ৰাম আৰু শান্তিৰ সময়";
-      periodIcon = "🌙";
-    }
-
-    const periodDesc = lang === 'as' ? periodTextAs : periodTextEn;
 
     // Pick distractors from other days of the week
     const otherDays = dayDict.filter((_, idx) => idx !== dayOfWeek);
@@ -703,9 +683,20 @@ class CognitiveGamesSuite {
         if (el) el.classList.add('bg-emerald-100', 'border-emerald-400', 'text-emerald-950');
       }
 
-      const praise = lang === 'as'
+      let praise = lang === 'as'
         ? "বৰ ধুনীয়া! আপুনি বৰ সুন্দৰকৈ মনত ৰাখিছে।"
         : "Wonderful! You did that so gently and beautifully.";
+
+      if (gameId === 'game-03') {
+        const live = window.I18N ? window.I18N.getRealTimeOrientation(lang) : null;
+        if (lang === 'as') {
+          praise = `হয়, ঠিক কৈছে! আজি হৈছে ${live ? live.dayName : 'বুধবাৰ'}। বৰ সুন্দৰকৈ মনত ৰাখিছে আইতা!`;
+        } else if (lang === 'bn') {
+          praise = `হ্যাঁ, একদম ঠিক! আজ ${live ? live.dayName : 'বুধবার'}। খুব সুন্দর মনে রেখেছেন দিদিমা!`;
+        } else {
+          praise = `Yes, exactly! Today is ${live ? live.dayName : 'Wednesday'}. Wonderful focus, Aita!`;
+        }
+      }
 
       if (window.speechEngine) {
         window.speechEngine.speak(praise, null, () => {

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>XORON - Cognitive Care in the Language of Home | SIH 2026</title>
   <!-- Mobile App Manifest & Icons (PWA & Android Standalone) -->
   <link rel="manifest" href="/static/manifest.json">
@@ -19,59 +19,57 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/css/style.css?v=5.0">
 </head>
-<body class="bg-[#FAF7F2] text-gray-800 min-h-screen flex flex-col font-sans">
+<body class="bg-[#FAF7F2] text-gray-800 min-h-screen flex flex-col font-sans antialiased selection:bg-amber-200">
 
-  <!-- TOP HEADER & BRAND BAR -->
-  <header class="bg-white border-b border-amber-100 shadow-sm sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+  <!-- TOP HEADER & BRAND BAR (Mobile & Tablet First) -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-amber-100 shadow-sm sticky top-0 z-30 transition-all">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3.5 flex flex-wrap items-center justify-between gap-2.5 sm:gap-4">
       
       <!-- Brand & SIH Badge -->
-      <div class="flex items-center gap-3.5 cursor-pointer" onclick="window.app.switchTab('patient')">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white text-2xl shadow-md flex-shrink-0">
+      <div class="flex items-center gap-2.5 sm:gap-3.5 cursor-pointer" onclick="window.app.switchTab('patient')">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white text-xl sm:text-2xl shadow-md flex-shrink-0">
           🧠
         </div>
         <div>
-          <div class="flex items-center gap-2">
-            <span class="text-2xl font-black tracking-tight text-amber-950" data-i18n="appName">XORON (স্মৰণ)</span>
-            <span class="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-              SIH26003 • MedTech
+          <div class="flex items-center gap-1.5 sm:gap-2">
+            <span class="text-xl sm:text-2xl font-black tracking-tight text-amber-950" data-i18n="appName">XORON (স্মৰণ)</span>
+            <span class="text-[9px] sm:text-[10px] uppercase tracking-wider font-extrabold px-2 sm:px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+              SIH26003
             </span>
           </div>
-          <p class="text-xs text-amber-800 font-medium" data-i18n="appTagline">
+          <p class="text-[11px] sm:text-xs text-amber-800 font-medium line-clamp-1" data-i18n="appTagline">
             Cognitive Care in the Language of Home • Team Invincible Core
           </p>
         </div>
       </div>
 
-      <!-- Language Selector (English + 5 NER Languages) -->
-      <div class="flex items-center gap-1.5 flex-wrap bg-amber-50 p-1.5 rounded-full border border-amber-200">
-        <span class="text-xs font-bold text-amber-900 px-2 flex items-center gap-1">
-          <span>🌐</span> <span>Lang:</span>
+      <!-- Language Selector (Smooth Horizontal Swipe on Mobile) -->
+      <div class="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar max-w-full bg-amber-50/90 py-1 px-2 rounded-full border border-amber-200">
+        <span class="text-[11px] font-bold text-amber-900 px-1 flex items-center gap-1 flex-shrink-0">
+          <span>🌐</span> <span class="hidden xs:inline">Lang:</span>
         </span>
-        <button onclick="window.app.changeLanguage('en')" class="lang-pill" data-lang="en">English</button>
-        <button onclick="window.app.changeLanguage('as')" class="lang-pill active-lang" data-lang="as">অসমীয়া</button>
-        <button onclick="window.app.changeLanguage('bn')" class="lang-pill" data-lang="bn">বাংলা</button>
-        <button onclick="window.app.changeLanguage('brx')" class="lang-pill" data-lang="brx">बड़ो</button>
-        <button onclick="window.app.changeLanguage('mni')" class="lang-pill" data-lang="mni">মৈতৈলোন্</button>
-        <button onclick="window.app.changeLanguage('ne')" class="lang-pill" data-lang="ne">नेपाली</button>
+        <button onclick="window.app.changeLanguage('en')" class="lang-pill text-xs py-1 px-2.5 flex-shrink-0" data-lang="en">English</button>
+        <button onclick="window.app.changeLanguage('as')" class="lang-pill active-lang text-xs py-1 px-2.5 flex-shrink-0" data-lang="as">অসমীয়া</button>
+        <button onclick="window.app.changeLanguage('bn')" class="lang-pill text-xs py-1 px-2.5 flex-shrink-0" data-lang="bn">বাংলা</button>
+        <button onclick="window.app.changeLanguage('brx')" class="lang-pill text-xs py-1 px-2.5 flex-shrink-0" data-lang="brx">बड़ो</button>
+        <button onclick="window.app.changeLanguage('mni')" class="lang-pill text-xs py-1 px-2.5 flex-shrink-0" data-lang="mni">মৈতৈলোন্</button>
+        <button onclick="window.app.changeLanguage('ne')" class="lang-pill text-xs py-1 px-2.5 flex-shrink-0" data-lang="ne">नेपाली</button>
       </div>
 
-      <div class="flex items-center gap-2">
-        <!-- Install Mobile App (PWA) Button -->
-        <button id="btn-install-app" onclick="window.app.promptInstallMobileApp()" class="px-4 py-2 rounded-2xl flex items-center gap-2 text-sm bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow-sm active:scale-95 transition">
+      <!-- Header Action Buttons (Hidden on small mobile since bottom bar handles it) -->
+      <div class="hidden sm:flex items-center gap-2">
+        <button id="btn-install-app" onclick="window.app.promptInstallMobileApp()" class="px-3.5 py-2 rounded-2xl flex items-center gap-1.5 text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow-sm active:scale-95 transition">
           <span>📲</span> <span>Install App</span>
         </button>
-
-        <!-- Quick Action: AI Memory Assistant Trigger -->
-        <button onclick="window.memoryChatbot.toggleChat(true)" class="btn-warm px-4 py-2 rounded-2xl flex items-center gap-2 text-sm shadow-sm active:scale-95 transition">
-          <span>🎙️</span> <span data-i18n="btnOpenChatbot">Ask Memory Companion</span>
+        <button onclick="window.memoryChatbot.toggleChat(true)" class="btn-warm px-3.5 py-2 rounded-2xl flex items-center gap-1.5 text-xs shadow-sm active:scale-95 transition">
+          <span>🎙️</span> <span data-i18n="btnOpenChatbot">Ask Sathi</span>
         </button>
       </div>
 
     </div>
 
-    <!-- Mode Navigation Tabs -->
-    <nav class="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-2 overflow-x-auto border-t border-amber-50">
+    <!-- Desktop Mode Navigation Tabs (Hidden on Mobile & Tablet, handled by Fixed Bottom Bar) -->
+    <nav class="hidden lg:flex max-w-7xl mx-auto px-4 sm:px-6 py-2 items-center gap-2 overflow-x-auto border-t border-amber-50">
       <button onclick="window.app.switchTab('patient')" class="nav-tab-btn nav-tab-active" data-tab="patient" data-i18n="navPatient">
         Patient App
       </button>
@@ -90,14 +88,14 @@
       <button onclick="window.app.switchTab('sih')" class="nav-tab-btn" data-tab="sih" data-i18n="navSih">
         SIH 2026 Pitch & Research
       </button>
-      <button onclick="window.app.toggleMobileFrame()" class="nav-tab-btn bg-amber-50 text-amber-900 flex items-center gap-1.5 ml-auto font-bold border border-amber-300">
+      <button onclick="window.app.toggleMobileFrame()" class="nav-tab-btn bg-amber-50 text-amber-900 hidden lg:inline-flex items-center gap-1.5 ml-auto font-bold border border-amber-300">
         <span>📱</span> <span id="mobile-frame-btn-text">Phone Frame View</span>
       </button>
     </nav>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+  <!-- MAIN CONTAINER (Padded bottom on mobile/tablet for bottom nav bar) -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-6 pb-28 lg:pb-8">
 
     <!-- ================================================================= -->
     <!-- VIEW 1: PATIENT APP EXPERIENCE (ULTRA-SIMPLE, VOICE-FIRST, ZERO-ANXIETY) -->
@@ -809,11 +807,42 @@
     </div>
   </div>
 
-  <!-- FLOATING PERSISTENT SATHI BUTTON -->
+  <!-- FLOATING PERSISTENT SATHI BUTTON (Desktop Only) -->
   <button onclick="window.memoryChatbot.toggleChat(true)" title="Ask Xoron Sathi"
-    class="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 text-white text-2xl flex items-center justify-center shadow-2xl border-4 border-white hover:scale-105 active:scale-95 transition z-40">
+    class="hidden lg:flex fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 text-white text-2xl items-center justify-center shadow-2xl border-4 border-white hover:scale-105 active:scale-95 transition z-40">
     🌸
   </button>
+
+  <!-- MOBILE & TABLET BOTTOM NAVIGATION BAR (Thumb-Accessible Native UI) -->
+  <nav id="mobile-bottom-nav" class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-amber-200 px-2 py-1.5 flex items-center justify-around shadow-[0_-4px_25px_rgba(0,0,0,0.08)]">
+    <button onclick="window.app.switchTab('patient')" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-3 rounded-2xl text-amber-900 font-black transition active:scale-90" data-tab="patient">
+      <span class="text-xl mb-0.5 scale-110 transition-transform">🏠</span>
+      <span class="text-[10px] tracking-tight">Home</span>
+    </button>
+
+    <button onclick="window.app.switchTab('reminiscence')" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-3 rounded-2xl text-gray-500 transition active:scale-90" data-tab="reminiscence">
+      <span class="text-xl mb-0.5 transition-transform">📖</span>
+      <span class="text-[10px] tracking-tight">Stories</span>
+    </button>
+
+    <!-- Center Floating Action Button for Voice Companion Sathi -->
+    <button onclick="window.memoryChatbot.toggleChat(true)" class="flex flex-col items-center justify-center -mt-6 py-1 px-2.5 transition active:scale-90 group" title="Ask Sathi Voice Companion">
+      <div class="w-13 h-13 p-3 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 text-white text-2xl flex items-center justify-center shadow-lg border-4 border-white group-hover:scale-105 transition-transform">
+        🎙️
+      </div>
+      <span class="text-[10px] font-black text-amber-950 mt-0.5">Sathi</span>
+    </button>
+
+    <button onclick="window.app.switchTab('widget')" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-3 rounded-2xl text-gray-500 transition active:scale-90" data-tab="widget">
+      <span class="text-xl mb-0.5 transition-transform">⏰</span>
+      <span class="text-[10px] tracking-tight">Routine</span>
+    </button>
+
+    <button onclick="window.app.switchTab('caregiver')" class="mobile-nav-btn flex flex-col items-center justify-center py-1 px-3 rounded-2xl text-gray-500 transition active:scale-90" data-tab="caregiver">
+      <span class="text-xl mb-0.5 transition-transform">🩺</span>
+      <span class="text-[10px] tracking-tight">Caregiver</span>
+    </button>
+  </nav>
 
   <!-- SCRIPTS (Cache-busted v5.0 for immediate neural voice activation) -->
   <script src="/static/js/i18n.js?v=5.0"></script>

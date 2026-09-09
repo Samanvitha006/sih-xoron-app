@@ -543,6 +543,123 @@ const I18N = {
     return false;
   },
 
+  getRealTimeOrientation(lang = null) {
+    const activeLang = lang || this.currentLang || 'as';
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, ...
+    const dateNum = now.getDate();
+    const monthIdx = now.getMonth();
+    const year = now.getFullYear();
+    const hours = now.getHours();
+
+    const days = [
+      { en: 'Sunday', as: 'দেওবাৰ', bn: 'রবিবার', brx: 'रबिबार', mni: 'নোংমাইজিং', ne: 'आइतबार' },
+      { en: 'Monday', as: 'সোমবাৰ', bn: 'সোমবার', brx: 'समबार', mni: 'নিংথৌকাবা', ne: 'सोमबार' },
+      { en: 'Tuesday', as: 'মঙলবাৰ', bn: 'মঙ্গলবার', brx: 'मंगलबार', mni: 'লৈপাকপোকপা', ne: 'मंगलबार' },
+      { en: 'Wednesday', as: 'বুধবাৰ', bn: 'বুধবার', brx: 'बुधबार', mni: 'য়ুমশাকৈশা', ne: 'बुधबार' },
+      { en: 'Thursday', as: 'বৃহস্পতিবাৰ', bn: 'বৃহস্পতিবার', brx: 'बृहस्पतिबार', mni: 'শগোলসেন', ne: 'बिहीबार' },
+      { en: 'Friday', as: 'শুক্ৰবাৰ', bn: 'শুক্রবার', brx: 'सुक्रबार', mni: 'ইরাই', ne: 'शुक्रबार' },
+      { en: 'Saturday', as: 'শনিবাৰ', bn: 'শনিবার', brx: 'सनिबार', mni: 'থাংজা', ne: 'शनिबार' }
+    ];
+
+    const months = [
+      { en: 'January', as: 'জানুৱাৰী', bn: 'জানুয়ারি', brx: 'जानुवारी', mni: 'জানুৱারী', ne: 'जनवरी' },
+      { en: 'February', as: 'ফেব্ৰুৱাৰী', bn: 'ফেব্রুয়ারি', brx: 'फेब्रुवारी', mni: 'ফেব্রুৱারী', ne: 'फेब्रुअरी' },
+      { en: 'March', as: 'মাৰ্চ', bn: 'মার্চ', brx: 'मार्स', mni: 'মার্চ', ne: 'मार्च' },
+      { en: 'April', as: 'এপ্ৰিল', bn: 'এপ্রিল', brx: 'एप्रिल्', mni: 'এপ্রিল', ne: 'अप्रिल' },
+      { en: 'May', as: 'মে’', bn: 'মে', brx: 'मे', mni: 'মে', ne: 'मे' },
+      { en: 'June', as: 'জুন', bn: 'জুন', brx: 'जुन', mni: 'জুন', ne: 'जुन' },
+      { en: 'July', as: 'জুলাই', bn: 'জুলাই', brx: 'जुलाइ', mni: 'জুলাই', ne: 'जुलाई' },
+      { en: 'August', as: 'আগষ্ট', bn: 'আগস্ট', brx: 'अगस्त', mni: 'আগস্ট', ne: 'अगस्ट' },
+      { en: 'September', as: 'ছেপ্টেম্বৰ', bn: 'সেপ্টেম্বর', brx: 'सेप्तेम्बर', mni: 'সেপ্টেম্বর', ne: 'सेप्टेम्बर' },
+      { en: 'October', as: 'অক্টোবৰ', bn: 'অক্টোবর', brx: 'अक्तोबर', mni: 'অক্টোবর', ne: 'अक्टोबर' },
+      { en: 'November', as: 'নৱেম্বৰ', bn: 'নভেম্বর', brx: 'नबेम्बर', mni: 'নভেম্বর', ne: 'नोभेम्बर' },
+      { en: 'December', as: 'ডিচেম্বৰ', bn: 'ডিসেম্বর', brx: 'दिसेम्बर', mni: 'ডিসেম্বর', ne: 'डिसेम्बर' }
+    ];
+
+    const dayObj = days[dayOfWeek] || days[3];
+    const monthObj = months[monthIdx] || months[8];
+    const dayName = dayObj[activeLang] || dayObj.en;
+    const monthName = monthObj[activeLang] || monthObj.en;
+
+    const toRegionalDigits = (num, l) => {
+      if (l === 'as' || l === 'bn') {
+        const digits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+        return String(num).split('').map(d => digits[parseInt(d, 10)] || d).join('');
+      }
+      return String(num);
+    };
+
+    const regionalDate = toRegionalDigits(dateNum, activeLang);
+    const regionalYear = toRegionalDigits(year, activeLang);
+
+    // Real-Time Time of Day Period
+    let timeOfDayEn = "Morning Chai Time";
+    let timeOfDayAs = "ৰাতিপুৱাৰ চাহৰ সময়";
+    let timeOfDayBn = "সকালের চা পানের সময়";
+    let timeOfDayPeriod = "Peaceful Morning in Dispur, Guwahati";
+    let timeOfDayPeriodAs = "দিছপুৰ, গুৱাহাটীৰ এটি শান্ত পুৱা";
+    let timeOfDayPeriodBn = "শান্ত সকাল, দিসপুর গুয়াহাটি";
+    let periodIcon = "☀️";
+
+    if (hours >= 12 && hours < 16) {
+      timeOfDayEn = "Calm Afternoon Rest";
+      timeOfDayAs = "দুপৰীয়াৰ শান্ত বিশ্ৰাম";
+      timeOfDayBn = "দুপুরের শান্ত বিশ্রাম";
+      timeOfDayPeriod = "Gentle Afternoon at Home in Dispur";
+      timeOfDayPeriodAs = "ঘৰুৱা পৰিৱেশত দুপৰীয়াৰ জিৰণি";
+      timeOfDayPeriodBn = "বাড়িতে দুপুরের শান্ত পরিবেশ";
+      periodIcon = "🌤️";
+    } else if (hours >= 16 && hours < 20) {
+      timeOfDayEn = "Evening Family Tea Time";
+      timeOfDayAs = "গধূলিৰ পৰিয়াল আৰু চাহৰ সময়";
+      timeOfDayBn = "সন্ধ্যার পারিবারিক মিলন";
+      timeOfDayPeriod = "Soothing Twilight Evening with Family";
+      timeOfDayPeriodAs = "গধূলিৰ শান্ত চাকি আৰু পৰিয়ালৰ সময়";
+      timeOfDayPeriodBn = "সন্ধ্যার মনোরম পরিবেশ";
+      periodIcon = "🌆";
+    } else if (hours >= 20 || hours < 5) {
+      timeOfDayEn = "Peaceful Night & Rest";
+      timeOfDayAs = "নিশাৰ নিৰিবিলি বিশ্ৰাম";
+      timeOfDayBn = "রাতের নিশ্চিন্ত বিশ্রাম";
+      timeOfDayPeriod = "Cozy & Safe Night in Warm Home";
+      timeOfDayPeriodAs = "নিশাৰ বিশ্ৰাম, আপুনি নিৰাপদে আছে";
+      timeOfDayPeriodBn = "শান্ত রাত, আপনি নিরাপদে আছেন";
+      periodIcon = "🌙";
+    }
+
+    const timeOfDay = activeLang === 'as' ? timeOfDayAs : (activeLang === 'bn' ? timeOfDayBn : timeOfDayEn);
+    const timePeriodText = activeLang === 'as' ? timeOfDayPeriodAs : (activeLang === 'bn' ? timeOfDayPeriodBn : timeOfDayPeriod);
+
+    let subtitleOrientation = "";
+    if (activeLang === 'as') {
+      subtitleOrientation = `আজি ${dayName}, ${regionalDate} ${monthName} • ${timePeriodText}`;
+    } else if (activeLang === 'bn') {
+      subtitleOrientation = `আজ ${dayName}, ${regionalDate} ${monthName} • ${timePeriodText}`;
+    } else {
+      const getOrdinal = (n) => {
+        const s = ["th", "st", "nd", "rd"], v = n % 100;
+        return n + (s[(v - 20) % 10] || s[v] || s[0]);
+      };
+      subtitleOrientation = `Today is ${dayName}, ${getOrdinal(dateNum)} ${monthName} • ${timePeriodText}`;
+    }
+
+    return {
+      dayOfWeek,
+      dayName,
+      monthName,
+      dateNum,
+      year,
+      regionalDate,
+      regionalYear,
+      timeOfDay,
+      timePeriodText,
+      periodIcon,
+      subtitleOrientation,
+      realityDate: `${regionalDate} ${monthName} ${regionalYear}`
+    };
+  },
+
   updateDOM() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
@@ -556,6 +673,20 @@ const I18N = {
       }
     });
 
+    // Real-Time Dynamic Temporal Grounding Overrides (Guarantees Real-Time Date & Day)
+    const live = this.getRealTimeOrientation(this.currentLang);
+    const subEl = document.querySelector('[data-i18n="subtitleOrientation"]');
+    if (subEl) subEl.textContent = live.subtitleOrientation;
+
+    const dayEl = document.querySelector('[data-i18n="realityDay"]');
+    if (dayEl) dayEl.textContent = live.dayName;
+
+    const dateEl = document.querySelector('[data-i18n="realityDate"]');
+    if (dateEl) dateEl.textContent = live.realityDate;
+
+    const todEl = document.querySelector('[data-i18n="realityTimeOfDay"]');
+    if (todEl) todEl.textContent = live.timeOfDay;
+
     // Update active state in language selector pills
     document.querySelectorAll('.lang-pill').forEach(btn => {
       if (btn.getAttribute('data-lang') === this.currentLang) {
@@ -566,5 +697,14 @@ const I18N = {
     });
   }
 };
+
+// Periodic orientation updater (every 60s)
+setInterval(() => {
+  if (window.I18N) {
+    const live = window.I18N.getRealTimeOrientation();
+    const subEl = document.querySelector('[data-i18n="subtitleOrientation"]');
+    if (subEl) subEl.textContent = live.subtitleOrientation;
+  }
+}, 60000);
 
 window.I18N = I18N;

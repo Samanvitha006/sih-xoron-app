@@ -391,3 +391,130 @@ body.phone-mockup-active .nav-tab-active {
   border-radius: 22px !important;
 }
 
+/* ========================================================================= */
+/* NATIVE MOBILE & TABLET FIRST RESPONSIVE ARCHITECTURE                      */
+/* Applied directly to all real mobile and tablet viewports (<= 1024px)     */
+/* ========================================================================= */
+
+/* Utility: Hide scrollbar in horizontal swipe containers */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mobile & Tablet Fixed Bottom Navigation Bar */
+#mobile-bottom-nav {
+  padding-bottom: calc(0.45rem + env(safe-area-inset-bottom, 0px));
+}
+
+.mobile-nav-btn {
+  min-width: 58px;
+  min-height: 48px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Tablet & Mobile Layout Rules (<= 1024px) */
+@media (max-width: 1024px) {
+  /* Touch target accessibility for elderly users */
+  button, .game-card, .family-card, .reminder-item-card {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent inputs from zooming unexpectedly on iOS */
+  input[type="text"], textarea, select {
+    font-size: 16px !important;
+  }
+
+  /* Decompress 11 Games Suite into responsive touch cards */
+  #games-catalog-container {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  /* Living Memory Bank 2-column or 3-column comfortable grid */
+  #living-memory-cards-container {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  /* Responsive Game Modal: Bottom sheet on mobile, centered card on tablet */
+  #game-modal > div {
+    max-width: 94vw !important;
+    max-height: 92vh !important;
+    border-radius: 28px !important;
+    margin: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #game-modal-content button {
+    min-height: 54px !important;
+  }
+
+  /* Caregiver Dashboard Charts */
+  #view-caregiver .grid-cols-1.lg\:grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  #cg-biomarkers-container .grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+  }
+}
+
+/* Specific Smartphone Adjustments (<= 640px) */
+@media (max-width: 640px) {
+  /* Welcome Orientation Banner */
+  #view-patient > div:first-child {
+    padding: 20px 16px !important;
+  }
+
+  #view-patient h1 {
+    font-size: 1.65rem !important;
+    line-height: 2rem !important;
+  }
+
+  /* Big Play Button */
+  #view-patient button.btn-warm {
+    width: 100% !important;
+    padding: 16px 18px !important;
+    justify-content: center !important;
+  }
+
+  /* Living Memory Bank: Exactly 2 cards per row on mobile */
+  #living-memory-cards-container {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #living-memory-cards-container .family-card {
+    padding: 12px 10px !important;
+  }
+
+  #living-memory-cards-container .w-20.h-20 {
+    width: 62px !important;
+    height: 62px !important;
+  }
+
+  /* 11 Games Suite: 1 full-width card per row on mobile */
+  #games-catalog-container {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Reminders card adjustments */
+  .reminder-item-card {
+    padding: 12px !important;
+    gap: 8px !important;
+  }
+
+  .reminder-item-card .w-12.h-12 {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 1.25rem !important;
+  }
+}
+

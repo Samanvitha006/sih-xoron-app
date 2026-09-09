@@ -62,7 +62,7 @@ def test_xoron_endpoints():
     r = client.get("/api/reminders/pat-ner-001")
     assert r.status_code == 200
     reminders = r.json()
-    assert len(reminders) >= 4
+    assert len(reminders) >= 8
     print(f"[PASS] Routine & Med Reminders: {len(reminders)} active items loaded")
 
     # 6. Cognitive Sessions & Longitudinal Domain Stats
