@@ -127,15 +127,19 @@ class XoronApp {
 
   toggleMobileFrame() {
     const main = document.querySelector('main');
+    const body = document.body;
     const btnText = document.getElementById('mobile-frame-btn-text');
     if (!main) return;
 
-    if (main.classList.contains('mobile-bezel-frame')) {
+    if (body.classList.contains('phone-mockup-active')) {
+      body.classList.remove('phone-mockup-active');
       main.classList.remove('mobile-bezel-frame');
       if (btnText) btnText.textContent = "Phone Frame View";
     } else {
+      body.classList.add('phone-mockup-active');
       main.classList.add('mobile-bezel-frame');
       if (btnText) btnText.textContent = "Exit Phone Frame";
+      main.scrollTop = 0;
     }
   }
 }
