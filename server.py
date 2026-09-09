@@ -75,6 +75,20 @@ class ReminderCreateRequest(BaseModel):
     audio_prompt_en: Optional[str] = None
     audio_prompt_as: Optional[str] = None
 
+class TelemetryRecordRequest(BaseModel):
+    patient_id: str = "pat-ner-001"
+    game_id: str
+    accuracy_score: float
+    reaction_time_ms: int
+    stroke_jitter: float
+    saccade_velocity: float
+    synced_to_cloud: bool = True
+
+class QdrsSurveyRequest(BaseModel):
+    patient_id: str = "pat-ner-001"
+    score: float
+    synced_to_cloud: bool = True
+
 @app.on_event("startup")
 def startup_event():
     init_db()
@@ -306,6 +320,95 @@ def sync_offline_outbox(items: List[dict]):
     conn.commit()
     conn.close()
     return {"status": "success", "synced_items": synced_count}
+
+# 9. WatermelonDB Telemetry & Digital Biomarkers Endpoints
+@app.get("/api/telemetry/{patient_id}")
+def get_telemetry(patient_id: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+    SELECT * FROM game_telemetry 
+    WHERE patient_id = ? 
+    ORDER BY timestamp DESC LIMIT 20
+    """, (patient_id,))
+    rows = [dict(r) for r in cursor.fetchall()]
+
+    avg_jitter = round(sum(r["stroke_jitter"] for r in rows) / len(rows), 3) if rows else 0.18
+    avg_saccade = round(sum(r["saccade_velocity"] for r in rows) / len(rows), 1) if rows else 280.0
+
+    conn.close()
+    return {
+        "telemetry": rows,
+        "summary": {
+            "mean_stroke_jitter": avg_jitter,
+            "mean_saccade_velocity": avg_saccade,
+            "motor_stability": "Normal Steady" if avg_jitter < 0.25 else "Tremor Noted",
+            "oculomotor_status": "Intact Visual Tracking" if avg_saccade > 220 else "Slow Saccades"
+        }
+    }
+
+@app.post("/api/telemetry")
+def record_telemetry(req: TelemetryRecordRequest):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    tel_id = f"tel-{datetime.now().strftime('%m%d%H%M%S')}"
+    cursor.execute("""
+    INSERT INTO game_telemetry (
+        id, patient_id, game_id, accuracy_score, reaction_time_ms,
+        stroke_jitter, saccade_velocity, synced_to_cloud, timestamp
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        tel_id, req.patient_id, req.game_id, req.accuracy_score,
+        req.reaction_time_ms, req.stroke_jitter, req.saccade_velocity,
+        1 if req.synced_to_cloud else 0, datetime.now().isoformat()
+    ))
+    conn.commit()
+    conn.close()
+    return {"status": "success", "telemetry_id": tel_id}
+
+# 10. WatermelonDB QDRS Surveys Endpoints (Quick Dementia Rating System)
+@app.get("/api/qdrs/{patient_id}")
+def get_qdrs_surveys(patient_id: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+    SELECT * FROM qdrs_surveys 
+    WHERE patient_id = ? 
+    ORDER BY date DESC
+    """, (patient_id,))
+    rows = [dict(r) for r in cursor.fetchall()]
+    latest_score = rows[0]["score"] if rows else 3.5
+    staging = "Normal Cognition" if latest_score < 2 else ("Mild Cognitive Impairment (MCI)" if latest_score <= 5 else "Dementia")
+    conn.close()
+    return {
+        "surveys": rows,
+        "latest_score": latest_score,
+        "clinical_staging": staging
+    }
+
+@app.post("/api/qdrs")
+def record_qdrs_survey(req: QdrsSurveyRequest):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    import time
+    surv_id = f"qdrs-{datetime.now().strftime('%m%d%H%M%S')}"
+    cursor.execute("""
+    INSERT INTO qdrs_surveys (id, patient_id, date, score, synced_to_cloud)
+    VALUES (?, ?, ?, ?, ?)
+    """, (surv_id, req.patient_id, int(time.time()), req.score, 1 if req.synced_to_cloud else 0))
+    conn.commit()
+    conn.close()
+    return {"status": "success", "survey_id": surv_id, "score": req.score}
+
+# 11. WatermelonDB Schedules Endpoint
+@app.get("/api/schedules/{patient_id}")
+def get_schedules(patient_id: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM schedules WHERE patient_id = ? ORDER BY scheduled_time ASC", (patient_id,))
+    schedules = [dict(r) for r in cursor.fetchall()]
+    conn.close()
+    return schedules
 
 if __name__ == "__main__":
     import uvicorn

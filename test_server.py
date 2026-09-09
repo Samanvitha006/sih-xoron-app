@@ -72,6 +72,54 @@ def test_xoron_endpoints():
     assert len(cohort) >= 2
     print(f"[PASS] ASHA Health Worker Cohort: {len(cohort)} rural patients monitored")
 
+    # 9. WatermelonDB Digital Biomarkers & Telemetry
+    r_tel = client.get("/api/telemetry/pat-ner-001")
+    assert r_tel.status_code == 200
+    tel_data = r_tel.json()
+    assert "summary" in tel_data
+    assert "mean_stroke_jitter" in tel_data["summary"]
+    assert "mean_saccade_velocity" in tel_data["summary"]
+    print(f"[PASS] WatermelonDB Telemetry: Mean Jitter={tel_data['summary']['mean_stroke_jitter']} mm/ms, Saccade={tel_data['summary']['mean_saccade_velocity']} deg/s")
+
+    # 10. POST Telemetry Sample
+    r_post_tel = client.post("/api/telemetry", json={
+        "patient_id": "pat-ner-001",
+        "game_id": "game-01",
+        "accuracy_score": 0.95,
+        "reaction_time_ms": 2200,
+        "stroke_jitter": 0.155,
+        "saccade_velocity": 295.0,
+        "synced_to_cloud": True
+    })
+    assert r_post_tel.status_code == 200
+    assert r_post_tel.json()["status"] == "success"
+    print("[PASS] POST Telemetry recorded successfully")
+
+    # 11. WatermelonDB QDRS Surveys
+    r_qdrs = client.get("/api/qdrs/pat-ner-001")
+    assert r_qdrs.status_code == 200
+    qdrs_data = r_qdrs.json()
+    assert "latest_score" in qdrs_data
+    assert "clinical_staging" in qdrs_data
+    print(f"[PASS] WatermelonDB QDRS Survey: Score={qdrs_data['latest_score']}, Stage={qdrs_data['clinical_staging']}")
+
+    # 12. POST QDRS Survey
+    r_post_qdrs = client.post("/api/qdrs", json={
+        "patient_id": "pat-ner-001",
+        "score": 3.0,
+        "synced_to_cloud": True
+    })
+    assert r_post_qdrs.status_code == 200
+    assert r_post_qdrs.json()["status"] == "success"
+    print("[PASS] POST QDRS Survey recorded successfully")
+
+    # 13. WatermelonDB Schedules
+    r_sched = client.get("/api/schedules/pat-ner-001")
+    assert r_sched.status_code == 200
+    schedules = r_sched.json()
+    assert len(schedules) >= 3
+    print(f"[PASS] WatermelonDB Schedules: {len(schedules)} daily schedule tasks retrieved")
+
     print("\nALL TESTS PASSED! XORON is fully verified and functional.")
 
 if __name__ == "__main__":

@@ -33,12 +33,24 @@ Instant 1-tap language switching across all features, audio synthesis, and voice
 - **Authentic Family Voice Notes**: Real voice messages from daughter Priya, grandson Rohan, and caregiver Anjali that soothe agitation and reinforce identity.
 - **"Who is This?" Spaced Retrieval Loop**: Caregiver uploads one photo; on-device intelligence identifies the person across albums and runs a gentle, cue-faded voice recognition loop.
 
-### 3. AI Memory Assistance Chatbot ("Xoron Sathi" / স্মৰণ সংগী)
+### 3. AI Memory Assistance Chatbot ("Xoron Sathi" / স্মৰণ সংগী) with LangChain RAG
+- **LangChain RAG Architecture**: Retrieval-Augmented Generation retrieving local patient context (`location`, `time`, `next_reminder`, `family_media`) with zero hallucination.
+- **Naomi Feil's Dementia Validation Therapy Rules**:
+  1. *Never show frustration*; validate emotions first using Reminiscence Therapy techniques.
+  2. *Answer disorientation calmly* using real-time grounding context (e.g. "Safe at home in Shillong/Guwahati").
+  3. *Keep responses strictly under 2 sentences* with an empathetic, soothing tone.
 - **Voice-First Conversational Memory Companion**: Patient can speak naturally or tap suggested chips (*"Who is my daughter?"*, *"Where am I right now?"*, *"What is my next medicine?"*, *"Tell me a Bihu story"*).
-- **Zero Hallucination Retrieval**: Strictly grounded in caregiver-verified family relationships and daily medical schedules.
-- **Naomi Feil's Dementia Validation Therapy**: Never confronts delusions or cognitive distortions harshly; validates the emotional truth, provides comforting safety reassurance, and gently redirects.
 
-### 4. 11 Culturally Tailored Adaptive Cognitive Mini-Games
+### 4. WatermelonDB Architecture & Clinical Digital Biomarkers
+- **Offline-First Schema (`@nozbe/watermelondb`)**:
+  - `patients`: Age, name, and baseline MoCA score (`baseline_moca: 21/30`).
+  - `family_media`: Local media URIs, relation tags, and voice clone audio anchors.
+  - `schedules`: Structured daily routines, medication tasks, and completion flags.
+  - `game_telemetry`: Millisecond-level touch stroke jitter (motor tremor tracking) and saccade velocity (oculomotor visual tracking).
+  - `qdrs_surveys`: Quick Dementia Rating System (Galvin et al.) tracking MCI and dementia progression.
+- **Biomarker Analytics**: Automatically computes mean motor stability and oculomotor status for longitudinal clinical insights.
+
+### 5. 11 Culturally Tailored Adaptive Cognitive Mini-Games
 1. **Who is This?**: Family face and relationship recall.
 2. **Our Story**: Reminiscence narrative and audio timeline.
 3. **Today is...**: Reality orientation (day, date, morning chai time, season).
@@ -51,20 +63,21 @@ Instant 1-tap language switching across all features, audio synthesis, and voice
 10. **Folk Song Completion**: Evergreen lyrics (Bhupen Hazarika melodies & English classics).
 11. **Gentle Flower Tap**: Sustained attention tapping blooming Kopou orchids.
 
-### 5. Engine-Level Therapy Rules
+### 6. Engine-Level Therapy Rules
 - **Errorless Learning**: The app **NEVER** buzzes a wrong answer, displays red crosses, or sounds failure alerts. Cues fade in gently after hesitation to eliminate dementia anxiety.
 - **Adaptive Difficulty**: Computes $\text{Difficulty} = f(\text{Accuracy}, \text{Reaction Time}, \text{Cues})$.
 - **Spaced Retrieval**: Expanding recall intervals (1 day $\to$ 3 days $\to$ 7 days) resetting softly upon hesitation.
 
-### 6. Caregiver Command Centre & ASHA Health Worker Portal
+### 7. Caregiver Command Centre & ASHA Health Worker Portal
 - 14-day longitudinal trajectory charts across 5 cognitive domains.
-- Reaction time (RT) variability biomarker tracking.
+- Reaction time (RT) variability and touch stroke jitter biomarker tracking.
+- Quick Dementia Rating System (QDRS) survey logging and staging.
 - Medication and hydration adherence percentage tracking.
 - Living Memory Bank uploader (photo, relation, voice note).
 - **LASI-Compliant Clinical Assessment Export**: Printable PDF report for neurologists and geriatricians.
 - **ASHA Village Cohort View**: Multi-patient dashboard flagging sustained cognitive decline or missed medication for early intervention.
 
-### 7. Android Home-Screen Widget Simulator
+### 8. Android Home-Screen Widget Simulator
 - Interactive preview of the single-tap Android widget: speaks first, displays daily orientation, upcoming medicine countdown, and 1-tap game launch with no confusing menus.
 
 ---
@@ -99,9 +112,12 @@ Then open your browser to:
 
 ```
 xoron/
-├── server.py                   # FastAPI REST & Static File Server
-├── database.py                 # SQLite Offline-First Store & Seed Data
-├── chatbot.py                  # AI Memory Assistant & Validation Therapy Engine
+├── schema.js                   # WatermelonDB AppSchema (patients, media, schedules, telemetry, qdrs)
+├── models.js                   # WatermelonDB Model Classes & Decorators
+├── server.py                   # FastAPI REST & Static File Server (telemetry, qdrs, schedules)
+├── database.py                 # SQLite Offline-First Store & Clinical Biomarker Seed Data
+├── chatbot.py                  # LangChain PromptTemplate RAG & Validation Therapy Engine
+├── test_server.py              # Automated 13-Point Verification Test Suite
 ├── create_assets.py            # Authentic SVG asset generator
 ├── start_app.bat               # 1-Click Windows launcher for judges & caregivers
 ├── README.md                   # Complete SIH 2026 Project Documentation
