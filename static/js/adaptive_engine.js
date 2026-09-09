@@ -196,8 +196,10 @@ class AdaptiveTherapyEngine {
     const strokeJitter = this.calculateStrokeJitter();
     const saccadeVelocity = Math.round(280 + (Math.random() * 20 - 10));
 
+    const activePatId = (window.app ? window.app.getActivePatientId() : "pat-ner-001");
+
     const sessionPayload = {
-      patient_id: "pat-ner-001",
+      patient_id: activePatId,
       game_id: gameId,
       game_title: gameTitle,
       domain: domain,
@@ -227,7 +229,7 @@ class AdaptiveTherapyEngine {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          patient_id: "pat-ner-001",
+          patient_id: activePatId,
           game_id: gameId,
           accuracy_score: parseFloat(accuracy.toFixed(2)),
           reaction_time_ms: Math.round(avgRt),

@@ -105,7 +105,7 @@ class MemoryChatbot {
         body: JSON.stringify({
           query: query,
           lang: lang,
-          patient_id: 'pat-ner-001'
+          patient_id: (window.app ? window.app.getActivePatientId() : 'pat-ner-001')
         })
       });
 

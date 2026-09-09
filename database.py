@@ -234,9 +234,19 @@ def init_db():
             seed_reminders(cursor, "pat-ner-001")
             conn.commit()
 
-        # Ensure reminiscence photo URLs use high-definition assets
+        # Ensure reminiscence and memory bank photo URLs use high-definition photographic assets
+        cursor.execute("UPDATE reminiscence_stories SET photo_url = '/static/assets/photos/bihu_memory.jpg' WHERE id = 'story-001'")
         cursor.execute("UPDATE reminiscence_stories SET photo_url = '/static/assets/photos/tea_memory.jpg' WHERE id = 'story-002'")
+        cursor.execute("UPDATE reminiscence_stories SET photo_url = '/static/assets/photos/graduation_memory.jpg' WHERE id = 'story-003'")
+        cursor.execute("UPDATE memory_bank SET photo_url = '/static/assets/photos/daughter_priya.jpg' WHERE id = 'mem-001'")
+        cursor.execute("UPDATE memory_bank SET photo_url = '/static/assets/photos/grandson_rohan.jpg' WHERE id = 'mem-002'")
+        cursor.execute("UPDATE memory_bank SET photo_url = '/static/assets/photos/husband_biren.jpg' WHERE id = 'mem-003'")
+        cursor.execute("UPDATE memory_bank SET photo_url = '/static/assets/photos/caregiver_anjali.jpg' WHERE id = 'mem-004'")
         cursor.execute("UPDATE family_media SET file_uri = '/static/assets/photos/tea_memory.jpg' WHERE id = 'fm-006'")
+        cursor.execute("UPDATE family_media SET file_uri = '/static/assets/photos/daughter_priya.jpg' WHERE id = 'fm-001'")
+        cursor.execute("UPDATE family_media SET file_uri = '/static/assets/photos/grandson_rohan.jpg' WHERE id = 'fm-002'")
+        cursor.execute("UPDATE family_media SET file_uri = '/static/assets/photos/husband_biren.jpg' WHERE id = 'fm-003'")
+        cursor.execute("UPDATE family_media SET file_uri = '/static/assets/photos/caregiver_anjali.jpg' WHERE id = 'fm-004'")
         conn.commit()
 
     conn.close()

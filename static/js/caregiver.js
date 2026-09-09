@@ -18,14 +18,14 @@ class CaregiverCommandCentre {
     this.dnfData = null;
   }
 
-  async loadDashboard() {
+  async loadDashboard(patientId = (window.app ? window.app.getActivePatientId() : 'pat-ner-001')) {
     try {
       const [sessResp, ashaResp, telResp, qdrsResp, dnfResp] = await Promise.all([
-        fetch('/api/sessions/pat-ner-001'),
+        fetch(`/api/sessions/${patientId}`),
         fetch('/api/asha/cohort'),
-        fetch('/api/telemetry/pat-ner-001'),
-        fetch('/api/qdrs/pat-ner-001'),
-        fetch('/api/dnf/pat-ner-001')
+        fetch(`/api/telemetry/${patientId}`),
+        fetch(`/api/qdrs/${patientId}`),
+        fetch(`/api/dnf/${patientId}`)
       ]);
       if (sessResp.ok) this.sessionData = await sessResp.json();
       if (ashaResp.ok) this.ashaCohort = await ashaResp.json();
@@ -125,7 +125,11 @@ class CaregiverCommandCentre {
       await fetch('/api/qdrs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ patient_id: 'pat-ner-001', score: score, synced_to_cloud: true })
+        body: JSON.stringify({
+          patient_id: (window.app ? window.app.getActivePatientId() : 'pat-ner-001'),
+          score: score,
+          synced_to_cloud: true
+        })
       });
       alert(`QDRS Assessment logged successfully: Score ${score}`);
       await this.loadDashboard();
@@ -530,7 +534,7 @@ class CaregiverCommandCentre {
     }
 
     const payload = {
-      patient_id: 'pat-ner-001',
+      patient_id: (window.app ? window.app.getActivePatientId() : 'pat-ner-001'),
       name: name,
       relationship: relation,
       location: location || "Assam",

@@ -234,6 +234,72 @@ def test_xoron_endpoints():
             break
     assert got_429, "Rate limiter failed to trigger 429 under burst!"
 
+    # 19. High-Definition Cultural Photography & Placeholder Asset Verification
+    required_photos = [
+        "daughter_priya.jpg",
+        "grandson_rohan.jpg",
+        "husband_biren.jpg",
+        "caregiver_anjali.jpg",
+        "custom_member.jpg",
+        "bihu_memory.jpg",
+        "tea_memory.jpg",
+        "graduation_memory.jpg"
+    ]
+    photos_dir = os.path.join("static", "assets", "photos")
+    for photo in required_photos:
+        p_path = os.path.join(photos_dir, photo)
+        assert os.path.exists(p_path), f"Missing required photo asset: {p_path}"
+        assert os.path.getsize(p_path) > 10000, f"Photo asset {photo} is abnormally small"
+    print(f"[PASS] Photorealistic Assets: All {len(required_photos)} high-definition photos verified on disk")
+
+    # Verify SVG backwards compatibility wrappers embed JPGs
+    svg_wrappers = ["daughter_priya.svg", "grandson_rohan.svg", "husband_biren.svg", "caregiver_anjali.svg", "bihu_memory.svg", "tea_memory.svg", "graduation_memory.svg"]
+    for svg_file in svg_wrappers:
+        svg_p = os.path.join(photos_dir, svg_file)
+        assert os.path.exists(svg_p), f"Missing SVG wrapper: {svg_p}"
+        with open(svg_p, "r", encoding="utf-8") as sf:
+            content = sf.read()
+            assert "<image" in content, f"SVG {svg_file} does not embed image tag"
+    print(f"[PASS] SVG Backwards Compatibility: All {len(svg_wrappers)} SVGs properly embed realistic JPG photos")
+
+    # 20. Patient Profiles & Login / Registration Workflow
+    r_pts = client.get("/api/patients")
+    assert r_pts.status_code == 200
+    pt_list = r_pts.json()
+    assert len(pt_list) >= 2
+    assert any(p["id"] == "pat-ner-001" for p in pt_list)
+    assert any(p["id"] == "pat-ner-002" for p in pt_list)
+    print(f"[PASS] GET /api/patients: Retrieved {len(pt_list)} registered patient profiles")
+
+    # Quick login existing
+    r_login_exist = client.post("/api/patient/login", json={"patient_id": "pat-ner-001"})
+    assert r_login_exist.status_code == 200
+    login_data = r_login_exist.json()
+    assert login_data["status"] == "success"
+    assert login_data["patient"]["name"] == "Hemlata Baruah"
+    print(f"[PASS] POST /api/patient/login (Existing): Logged in as {login_data['patient']['name']}")
+
+    # Register new patient
+    test_reg_name = "Nirmala Devi"
+    r_login_new = client.post("/api/patient/login", json={
+        "name": test_reg_name,
+        "preferred_name": "Maa",
+        "residence": "Sivasagar, Assam",
+        "hometown": "Nazira",
+        "primary_language": "as",
+        "age": 75,
+        "gender": "Female",
+        "caregiver_name": "Dipak Saikia",
+        "caregiver_phone": "+91 94350 77777",
+        "favorite_tea": "Assam Orthodox Red Tea"
+    })
+    assert r_login_new.status_code == 200
+    new_pt_data = r_login_new.json()
+    assert new_pt_data["status"] == "success"
+    assert new_pt_data["patient"]["name"] == test_reg_name
+    assert new_pt_data["patient"]["current_residence"] == "Sivasagar, Assam"
+    print(f"[PASS] POST /api/patient/login (New Onboarding): Created & onboarded {test_reg_name} ({new_pt_data['patient']['id']})")
+
     print("\nALL TESTS PASSED! XORON is fully verified and functional.")
 
 if __name__ == "__main__":

@@ -399,7 +399,8 @@ class CognitiveGamesSuite {
     };
 
     try {
-      const resp = await fetch('/api/reminders/pat-ner-001');
+      const activePat = (window.app ? window.app.getActivePatientId() : 'pat-ner-001');
+      const resp = await fetch(`/api/reminders/${activePat}`);
       if (resp.ok) {
         const rems = await resp.json();
         if (rems && rems.length > 0) {

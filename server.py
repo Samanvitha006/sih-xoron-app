@@ -166,6 +166,23 @@ class CartesiaConfigRequest(BaseModel):
     api_key: Optional[str] = None
     voice_ids: Optional[dict] = None
 
+class PatientLoginRequest(BaseModel):
+    patient_id: Optional[str] = None
+    name: Optional[str] = None
+    preferred_name: Optional[str] = None
+    age: Optional[int] = 72
+    gender: Optional[str] = "Female"
+    residence: Optional[str] = "Dispur, Guwahati"
+    hometown: Optional[str] = "Tezpur"
+    primary_language: Optional[str] = "as"
+    secondary_language: Optional[str] = "en"
+    caregiver_name: Optional[str] = "Anjali Baruah"
+    caregiver_relation: Optional[str] = "Daughter-in-law"
+    caregiver_phone: Optional[str] = "+91 94350 12345"
+    favorite_tea: Optional[str] = "Assam CTC Tea with fresh ginger"
+    favorite_festival: Optional[str] = "Rongali Bihu"
+    favorite_music: Optional[str] = "Bhupen Hazarika melodies"
+
 @app.on_event("startup")
 def startup_event():
     init_db()
@@ -177,7 +194,134 @@ def get_root():
         return FileResponse(index_path)
     return "<h1>XORON App initializing...</h1>"
 
-# 1. Patient Profile Endpoint
+# 1. Patient Profile & Login Endpoints
+@app.get("/api/patients")
+def get_all_patients():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT id, name, preferred_name, age, gender, current_residence,
+               primary_language, caregiver_name, caregiver_phone, dementia_stage
+        FROM patients ORDER BY created_at ASC
+    """)
+    patients = [dict(r) for r in cursor.fetchall()]
+    conn.close()
+    return patients
+
+@app.post("/api/patient/login")
+def login_or_register_patient(req: PatientLoginRequest):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # 1. Quick login by patient_id
+    if req.patient_id and req.patient_id.strip():
+        cursor.execute("SELECT * FROM patients WHERE id = ?", (req.patient_id.strip(),))
+        row = cursor.fetchone()
+        if row:
+            conn.close()
+            return {"status": "success", "action": "login", "patient": dict(row)}
+
+    # 2. Login or register by Name
+    if req.name and req.name.strip():
+        patient_name = req.name.strip()
+        cursor.execute("SELECT * FROM patients WHERE LOWER(name) = LOWER(?)", (patient_name,))
+        row = cursor.fetchone()
+        if row:
+            conn.close()
+            return {"status": "success", "action": "login", "patient": dict(row)}
+
+        # Register new patient
+        new_id = f"pat-{datetime.now().strftime('%m%d%H%M%S')}"
+        pref = req.preferred_name or patient_name.split()[0]
+        residence = req.residence or "Dispur, Guwahati"
+        lang = req.primary_language or "as"
+
+        cursor.execute("""
+        INSERT INTO patients (
+            id, name, preferred_name, age, gender, baseline_moca,
+            hometown, current_residence, primary_language, secondary_language,
+            dementia_stage, caregiver_name, caregiver_relation, caregiver_phone,
+            asha_worker_name, asha_center, favorite_tea, favorite_festival, favorite_music
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            new_id, patient_name, pref, req.age or 72, req.gender or "Female", 21.0,
+            req.hometown or residence, residence, lang, req.secondary_language or "en",
+            "Early Mild Cognitive Impairment", req.caregiver_name or "Caregiver",
+            req.caregiver_relation or "Family", req.caregiver_phone or "+91 94350 00000",
+            "Community Health Worker", "Dispur PHC",
+            req.favorite_tea or "Warm Assam Tea", req.favorite_festival or "Rongali Bihu",
+            req.favorite_music or "Assamese Folk Melodies"
+        ))
+
+        # Clone default family members & reminders for new patient
+        cursor.execute("SELECT * FROM memory_bank WHERE patient_id = 'pat-ner-001'")
+        default_mems = cursor.fetchall()
+        for idx, m in enumerate(default_mems):
+            m_dict = dict(m)
+            new_mem_id = f"mem-{new_id}-{idx+1}"
+            cursor.execute("""
+            INSERT OR IGNORE INTO memory_bank (
+                id, patient_id, name, relationship, relationship_as, relationship_bn,
+                relationship_brx, relationship_mni, relationship_ne,
+                photo_svg_tag, photo_url, voice_note_text, location, visit_schedule,
+                shared_memory, recall_interval_days, consecutive_success, last_tested
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                new_mem_id, new_id, m_dict['name'], m_dict['relationship'],
+                m_dict['relationship_as'], m_dict['relationship_bn'], m_dict['relationship_brx'],
+                m_dict['relationship_mni'], m_dict['relationship_ne'], m_dict['photo_svg_tag'],
+                m_dict['photo_url'], m_dict['voice_note_text'], m_dict['location'],
+                m_dict['visit_schedule'], m_dict['shared_memory'], m_dict['recall_interval_days'],
+                m_dict['consecutive_success'], m_dict['last_tested']
+            ))
+
+        # Clone reminders
+        cursor.execute("SELECT * FROM reminders WHERE patient_id = 'pat-ner-001'")
+        default_rems = cursor.fetchall()
+        for idx, r in enumerate(default_rems):
+            r_dict = dict(r)
+            new_rem_id = f"rem-{new_id}-{idx+1}"
+            cursor.execute("""
+            INSERT OR IGNORE INTO reminders (
+                id, patient_id, title, category, scheduled_time, dosage_or_detail,
+                audio_prompt_en, audio_prompt_as, audio_prompt_bn, audio_prompt_brx, audio_prompt_mni, audio_prompt_ne,
+                is_active, last_acknowledged
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NULL)
+            """, (
+                new_rem_id, new_id, r_dict['title'], r_dict['category'],
+                r_dict['scheduled_time'], r_dict['dosage_or_detail'],
+                r_dict['audio_prompt_en'], r_dict['audio_prompt_as'],
+                r_dict.get('audio_prompt_bn'), r_dict.get('audio_prompt_brx'),
+                r_dict.get('audio_prompt_mni'), r_dict.get('audio_prompt_ne')
+            ))
+
+        # Clone stories
+        cursor.execute("SELECT * FROM reminiscence_stories WHERE patient_id = 'pat-ner-001'")
+        default_stories = cursor.fetchall()
+        for idx, s in enumerate(default_stories):
+            s_dict = dict(s)
+            new_st_id = f"story-{new_id}-{idx+1}"
+            cursor.execute("""
+            INSERT OR IGNORE INTO reminiscence_stories (
+                id, patient_id, title, title_as, year_or_era, category,
+                narrative, narrative_as, family_voice_prompt, photo_url, cultural_soundtrack
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                new_st_id, new_id, s_dict['title'], s_dict.get('title_as'),
+                s_dict.get('year_or_era'), s_dict.get('category'), s_dict.get('narrative'),
+                s_dict.get('narrative_as'), s_dict.get('family_voice_prompt'), s_dict.get('photo_url'),
+                s_dict.get('cultural_soundtrack')
+            ))
+
+        conn.commit()
+        cursor.execute("SELECT * FROM patients WHERE id = ?", (new_id,))
+        created = cursor.fetchone()
+        conn.close()
+        return {"status": "success", "action": "register", "patient": dict(created)}
+
+    conn.close()
+    raise HTTPException(status_code=400, detail="Patient ID or Name required for login")
+
 @app.get("/api/patient/{patient_id}")
 def get_patient(patient_id: str):
     conn = get_db_connection()

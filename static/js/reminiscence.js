@@ -21,7 +21,7 @@ class ReminiscenceTherapy {
         relationship: "Daughter",
         relationship_as: "জীয়াৰী (Priya)",
         relationship_bn: "মেয়ে (Priya)",
-        photo_url: "/static/assets/photos/daughter_priya.svg",
+        photo_url: "/static/assets/photos/daughter_priya.jpg",
         voice_note_text: "Aita, this is your daughter Priya. I am a doctor at GMCH Guwahati. Remember when we made sweet narikol laru together? I love you!",
         location: "Guwahati (GMCH Quarters)",
         visit_schedule: "Visits every Sunday and calls daily at 7 PM",
@@ -33,7 +33,7 @@ class ReminiscenceTherapy {
         relationship: "Grandson",
         relationship_as: "নাতি ল'ৰা (Rohan)",
         relationship_bn: "নাতি (Rohan)",
-        photo_url: "/static/assets/photos/grandson_rohan.svg",
+        photo_url: "/static/assets/photos/grandson_rohan.jpg",
         voice_note_text: "Aita! I am Rohan. I study engineering in Jorhat. Every vacation I come home to eat your special duck curry with black sesame!",
         location: "Jorhat / Guwahati",
         visit_schedule: "Lives in home hostel, comes home every weekend",
@@ -45,7 +45,7 @@ class ReminiscenceTherapy {
         relationship: "Husband (Late)",
         relationship_as: "স্বামী (স্বৰ্গীয় বীৰেন)",
         relationship_bn: "স্বামী (স্বর্গীয় বীরেন)",
-        photo_url: "/static/assets/photos/husband_biren.svg",
+        photo_url: "/static/assets/photos/husband_biren.jpg",
         voice_note_text: "Your loving husband Biren. You both built your beautiful wooden veranda house in Tezpur in 1968.",
         location: "Tezpur / Dispur",
         visit_schedule: "Cherished Memory",
@@ -57,7 +57,7 @@ class ReminiscenceTherapy {
         relationship: "Caregiver & Daughter-in-law",
         relationship_as: "বোৱাৰী (Anjali)",
         relationship_bn: "বউমা (Anjali)",
-        photo_url: "/static/assets/photos/caregiver_anjali.svg",
+        photo_url: "/static/assets/photos/caregiver_anjali.jpg",
         voice_note_text: "Aita, I am Anjali! I am here in the kitchen making your warm ginger tea.",
         location: "Dispur, Guwahati (Lives with Aita)",
         visit_schedule: "Present at home all day",
@@ -74,7 +74,7 @@ class ReminiscenceTherapy {
         category: "Festival",
         narrative: "You wore your grandmother's woven Muga silk Mekhela Sador with red Pari border. Everyone danced to the sweet Pepa and Dhol beats under the big mango tree.",
         narrative_as: "আপুনি ৰঙা পাৰিৰ মুগাৰ মেখেলা চাদৰ পিন্ধিছিল। চোতালৰ বৰ আমজোপাৰ তলত সকলোৱে পেঁপা আৰু ঢোলৰ মাতত আনন্দ মনেৰে বিহু নাচিছিল।",
-        photo_url: "/static/assets/photos/bihu_memory.svg",
+        photo_url: "/static/assets/photos/bihu_memory.jpg",
         cultural_soundtrack: "Pepa and Dhol melody"
       },
       {
@@ -96,7 +96,7 @@ class ReminiscenceTherapy {
         category: "Children",
         narrative: "When Priya received her MBBS gold medal, you tied a hand-woven Gamusa around her neck with tears of joy. She dedicated her stethoscope to you.",
         narrative_as: "প্ৰিয়াই যেতিয়া গুৱাহাটী চিকিৎসা মহাবিদ্যালয়ৰ পৰা ডিগ্ৰী লৈছিল, আপুনি আনন্দৰ চকুপানীৰে ফুলাম গামোচা পিন্ধাই আশীৰ্বাদ দিছিল।",
-        photo_url: "/static/assets/photos/graduation_memory.svg",
+        photo_url: "/static/assets/photos/graduation_memory.jpg",
         cultural_soundtrack: "Acoustic harp and gentle chimes"
       }
     ];

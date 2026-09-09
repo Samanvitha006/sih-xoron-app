@@ -12,7 +12,7 @@ class RemindersManager {
     this.activeReminder = null;
   }
 
-  async loadReminders(patientId = 'pat-ner-001') {
+  async loadReminders(patientId = (window.app ? window.app.getActivePatientId() : 'pat-ner-001')) {
     const fallbackReminders = [
       {
         id: "rem-001",
@@ -196,7 +196,10 @@ class RemindersManager {
       await fetch(`/api/reminders/${reminderId}/ack`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ patient_id: 'pat-ner-001', status: 'taken' })
+        body: JSON.stringify({
+          patient_id: (window.app ? window.app.getActivePatientId() : 'pat-ner-001'),
+          status: 'taken'
+        })
       });
     } catch (e) {
       console.warn("Offline: acknowledging reminder locally");
