@@ -2,6 +2,7 @@
 Automated Verification Script for XORON FastAPI Server & Endpoints
 """
 from fastapi.testclient import TestClient
+import numpy as np
 from server import app
 
 client = TestClient(app)
@@ -119,6 +120,41 @@ def test_xoron_endpoints():
     schedules = r_sched.json()
     assert len(schedules) >= 3
     print(f"[PASS] WatermelonDB Schedules: {len(schedules)} daily schedule tasks retrieved")
+
+    # 14. Edge AI SuStIn DNF Direct Inference (calculate_dnf)
+    from dnf_engine import calculate_dnf, normalize_features
+    test_g = [0.76, 0.80, 0.65]
+    test_k = [0.62, 120.0, 0.20, 150.0]
+    test_o = [270.0, 16.0]
+    test_d = [78.0, 12.0]
+    norm_g, norm_k, norm_o, norm_d = normalize_features(test_g, test_k, test_o, test_d)
+    probs = calculate_dnf(norm_g, norm_k, norm_o, norm_d)
+    assert len(probs) == 3
+    assert abs(sum(probs) - 1.0) < 0.01
+    print(f"[PASS] Edge AI calculate_dnf: Probabilities={list(np.round(probs, 3))}, Sum={round(float(sum(probs)), 2)}")
+
+    # 15. GET /api/dnf/pat-ner-001
+    r_dnf = client.get("/api/dnf/pat-ner-001")
+    assert r_dnf.status_code == 200
+    dnf_data = r_dnf.json()
+    assert "classified_stage" in dnf_data
+    assert "probabilities" in dnf_data
+    assert "multimodal_inputs" in dnf_data
+    assert "Stage B" in dnf_data["classified_stage"]
+    print(f"[PASS] GET /api/dnf/pat-ner-001: Stage={dnf_data['classified_stage']} (Confidence: {dnf_data['confidence_pct']}%)")
+
+    # 16. POST /api/dnf/predict
+    r_dnf_pred = client.post("/api/dnf/predict", json={
+        "game_scores": [0.92, 0.95, 0.90],
+        "kinematics": [0.75, 150.0, 0.14, 90.0],
+        "oculomotor": [320.0, 15.0],
+        "demographics": [65.0, 16.0]
+    })
+    assert r_dnf_pred.status_code == 200
+    pred_data = r_dnf_pred.json()
+    assert pred_data["status"] == "success"
+    assert "Stage A" in pred_data["classified_stage"]
+    print(f"[PASS] POST /api/dnf/predict: Healthy Stage={pred_data['classified_stage']} (Confidence: {pred_data['confidence_pct']}%)")
 
     print("\nALL TESTS PASSED! XORON is fully verified and functional.")
 

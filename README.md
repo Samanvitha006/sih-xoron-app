@@ -50,7 +50,20 @@ Instant 1-tap language switching across all features, audio synthesis, and voice
   - `qdrs_surveys`: Quick Dementia Rating System (Galvin et al.) tracking MCI and dementia progression.
 - **Biomarker Analytics**: Automatically computes mean motor stability and oculomotor status for longitudinal clinical insights.
 
-### 5. 11 Culturally Tailored Adaptive Cognitive Mini-Games
+### 5. Edge AI SuStIn Disease Neurodegeneration Forecasting (DNF)
+- **Quantized Edge AI Model (`sustin_dnf_model.tflite`)**: Runs 100% on-device with zero cloud latency and complete patient privacy.
+- **Multimodal Feature Fusion**: Fuses 4 clinical biomarker streams into a unified 11-dimensional vector:
+  1. `game_scores`: Executive, Visuospatial, and Memory cognitive accuracy scores.
+  2. `kinematics`: Contact pressure, stroke velocity, drag jitter (tremor indicator), and air-hesitation flight time.
+  3. `oculomotor`: Saccade velocity and blink frequency (MediaPipe vision pipeline).
+  4. `demographics`: Patient age and formal education modifier.
+- **SuStIn Staging Classification**: Generates probability distribution across 3 progressive stages:
+  - `Stage A`: Normal Cognition / Pre-symptomatic
+  - `Stage B`: Mild Cognitive Impairment (MCI) *(e.g. Hemlata Baruah: 83.8% confidence)*
+  - `Stage C`: Dementia Progression
+- **Caregiver Visual Dashboard**: Animated probability distribution bars and multimodal input breakdown matrix.
+
+### 6. 11 Culturally Tailored Adaptive Cognitive Mini-Games
 1. **Who is This?**: Family face and relationship recall.
 2. **Our Story**: Reminiscence narrative and audio timeline.
 3. **Today is...**: Reality orientation (day, date, morning chai time, season).
@@ -63,21 +76,22 @@ Instant 1-tap language switching across all features, audio synthesis, and voice
 10. **Folk Song Completion**: Evergreen lyrics (Bhupen Hazarika melodies & English classics).
 11. **Gentle Flower Tap**: Sustained attention tapping blooming Kopou orchids.
 
-### 6. Engine-Level Therapy Rules
+### 7. Engine-Level Therapy Rules
 - **Errorless Learning**: The app **NEVER** buzzes a wrong answer, displays red crosses, or sounds failure alerts. Cues fade in gently after hesitation to eliminate dementia anxiety.
 - **Adaptive Difficulty**: Computes $\text{Difficulty} = f(\text{Accuracy}, \text{Reaction Time}, \text{Cues})$.
 - **Spaced Retrieval**: Expanding recall intervals (1 day $\to$ 3 days $\to$ 7 days) resetting softly upon hesitation.
 
-### 7. Caregiver Command Centre & ASHA Health Worker Portal
+### 8. Caregiver Command Centre & ASHA Health Worker Portal
 - 14-day longitudinal trajectory charts across 5 cognitive domains.
 - Reaction time (RT) variability and touch stroke jitter biomarker tracking.
+- SuStIn DNF Edge AI classification and 3-stage probability distribution.
 - Quick Dementia Rating System (QDRS) survey logging and staging.
 - Medication and hydration adherence percentage tracking.
 - Living Memory Bank uploader (photo, relation, voice note).
 - **LASI-Compliant Clinical Assessment Export**: Printable PDF report for neurologists and geriatricians.
 - **ASHA Village Cohort View**: Multi-patient dashboard flagging sustained cognitive decline or missed medication for early intervention.
 
-### 8. Android Home-Screen Widget Simulator
+### 9. Android Home-Screen Widget Simulator
 - Interactive preview of the single-tap Android widget: speaks first, displays daily orientation, upcoming medicine countdown, and 1-tap game launch with no confusing menus.
 
 ---
@@ -112,12 +126,16 @@ Then open your browser to:
 
 ```
 xoron/
+├── dnf_engine.py               # Edge AI SuStIn Classifier (calculate_dnf multimodal inference)
+├── sustin_dnf_model.tflite     # Quantized On-Device Edge AI Model
+├── build_sustin_model.py       # TFLite FlatBuffer Model Compiler & Weight Calibrator
+├── tflite_runtime/             # Python 3.13+ LiteRT runtime compatibility package
 ├── schema.js                   # WatermelonDB AppSchema (patients, media, schedules, telemetry, qdrs)
 ├── models.js                   # WatermelonDB Model Classes & Decorators
-├── server.py                   # FastAPI REST & Static File Server (telemetry, qdrs, schedules)
+├── server.py                   # FastAPI REST & Static File Server (telemetry, qdrs, schedules, dnf)
 ├── database.py                 # SQLite Offline-First Store & Clinical Biomarker Seed Data
 ├── chatbot.py                  # LangChain PromptTemplate RAG & Validation Therapy Engine
-├── test_server.py              # Automated 13-Point Verification Test Suite
+├── test_server.py              # Automated 16-Point Verification Test Suite
 ├── create_assets.py            # Authentic SVG asset generator
 ├── start_app.bat               # 1-Click Windows launcher for judges & caregivers
 ├── README.md                   # Complete SIH 2026 Project Documentation

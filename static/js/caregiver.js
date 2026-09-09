@@ -15,25 +15,29 @@ class CaregiverCommandCentre {
     this.ashaCohort = [];
     this.telemetryData = null;
     this.qdrsData = null;
+    this.dnfData = null;
   }
 
   async loadDashboard() {
     try {
-      const [sessResp, ashaResp, telResp, qdrsResp] = await Promise.all([
+      const [sessResp, ashaResp, telResp, qdrsResp, dnfResp] = await Promise.all([
         fetch('/api/sessions/pat-ner-001'),
         fetch('/api/asha/cohort'),
         fetch('/api/telemetry/pat-ner-001'),
-        fetch('/api/qdrs/pat-ner-001')
+        fetch('/api/qdrs/pat-ner-001'),
+        fetch('/api/dnf/pat-ner-001')
       ]);
       if (sessResp.ok) this.sessionData = await sessResp.json();
       if (ashaResp.ok) this.ashaCohort = await ashaResp.json();
       if (telResp.ok) this.telemetryData = await telResp.json();
       if (qdrsResp.ok) this.qdrsData = await qdrsResp.json();
+      if (dnfResp && dnfResp.ok) this.dnfData = await dnfResp.json();
 
       this.renderCharts();
       this.renderAshaCohort();
       this.renderBiomarkers();
       this.renderQdrsSurvey();
+      this.renderDnfProgression();
     } catch (e) {
       console.warn("Error loading caregiver dashboard", e);
       // Fallback offline data
@@ -41,8 +45,24 @@ class CaregiverCommandCentre {
         summary: { mean_stroke_jitter: 0.178, mean_saccade_velocity: 282.5, motor_stability: "Normal Steady", oculomotor_status: "Intact Visual Tracking" }
       };
       this.qdrsData = { latest_score: 3.5, clinical_staging: "Mild Cognitive Impairment (MCI)" };
+      this.dnfData = {
+        classified_stage: "Stage B (Mild Cognitive Impairment - MCI)",
+        confidence_pct: 84.5,
+        probabilities_pct: { stage_a: 15.4, stage_b_mci: 84.5, stage_c_dementia: 0.1 },
+        clinical_interpretation: "SuStIn progression indicates stable Stage B (Mild Cognitive Impairment). Preserved fine-motor stability with mild episodic memory hesitation. Errorless learning and Living Memory Bank active.",
+        multimodal_inputs: {
+          raw: {
+            game_scores: { executive: 0.78, visuospatial: 0.82, memory: 0.74 },
+            kinematics: { touch_pressure: 0.62, stroke_velocity_mm_s: 120.0, drag_jitter_mm_ms: 0.196, air_hesitation_ms: 145.0 },
+            oculomotor: { saccade_velocity_deg_s: 274.7, blink_frequency_per_min: 16.5 },
+            demographics: { age: 78, education_modifier: 12.0 }
+          }
+        },
+        edge_model: "sustin_dnf_model.tflite (Quantized On-Device)"
+      };
       this.renderBiomarkers();
       this.renderQdrsSurvey();
+      this.renderDnfProgression();
     }
   }
 
@@ -112,6 +132,121 @@ class CaregiverCommandCentre {
     } catch (e) {
       alert(`Saved locally in offline store (Score: ${score})`);
     }
+  }
+
+  renderDnfProgression() {
+    const container = document.getElementById('cg-dnf-container');
+    if (!container || !this.dnfData) return;
+
+    const d = this.dnfData;
+    const p = d.probabilities_pct;
+    const raw = d.multimodal_inputs ? d.multimodal_inputs.raw : null;
+
+    container.innerHTML = `
+      <div class="p-6 bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-3xl border-2 border-indigo-200 shadow-sm space-y-5">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs font-black px-2.5 py-0.5 rounded-full bg-indigo-600 text-white uppercase tracking-wider">
+                Edge AI • SuStIn Classifier
+              </span>
+              <span class="text-xs font-bold text-indigo-900 bg-indigo-100 px-2.5 py-0.5 rounded-full">
+                ⚡ TFLite Quantized (0ms Cloud Latency)
+              </span>
+            </div>
+            <h3 class="text-xl font-black text-gray-800 flex items-center gap-2">
+              <span>🧬</span> <span>Disease Neurodegeneration Forecasting (DNF)</span>
+            </h3>
+            <p class="text-xs text-gray-600 mt-0.5">
+              Multimodal fusion of game scores, touch kinematics, MediaPipe oculomotor tracking, and patient demographics.
+            </p>
+          </div>
+          <div class="text-left sm:text-right bg-white p-3 rounded-2xl border border-indigo-100 shadow-xs">
+            <div class="text-[11px] font-bold text-gray-500 uppercase tracking-wide">Predicted Staging</div>
+            <div class="text-base font-black text-indigo-950">${d.classified_stage}</div>
+            <div class="text-xs font-bold text-indigo-700">Confidence: ${d.confidence_pct}%</div>
+          </div>
+        </div>
+
+        <!-- 3-Stage Probability Distribution Bars -->
+        <div class="space-y-2.5 bg-white p-4 rounded-2xl border border-indigo-100">
+          <div class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">SuStIn Progression Probability Distribution:</div>
+          
+          <!-- Stage A -->
+          <div>
+            <div class="flex justify-between text-xs font-bold text-gray-700 mb-1">
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Stage A (Normal / Pre-symptomatic)</span>
+              <span>${p.stage_a}%</span>
+            </div>
+            <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+              <div class="bg-emerald-500 h-full rounded-full transition-all duration-700" style="width: ${p.stage_a}%"></div>
+            </div>
+          </div>
+
+          <!-- Stage B (MCI) -->
+          <div>
+            <div class="flex justify-between text-xs font-bold text-indigo-950 mb-1">
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> Stage B (Mild Cognitive Impairment - MCI)</span>
+              <span class="font-black text-indigo-700">${p.stage_b_mci}% (Active Classification)</span>
+            </div>
+            <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+              <div class="bg-amber-500 h-full rounded-full transition-all duration-700" style="width: ${p.stage_b_mci}%"></div>
+            </div>
+          </div>
+
+          <!-- Stage C (Dementia) -->
+          <div>
+            <div class="flex justify-between text-xs font-bold text-gray-700 mb-1">
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> Stage C (Dementia Progression)</span>
+              <span>${p.stage_c_dementia}%</span>
+            </div>
+            <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+              <div class="bg-rose-500 h-full rounded-full transition-all duration-700" style="width: ${p.stage_c_dementia}%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Multimodal Input Vector Grid -->
+        ${raw ? `
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div class="p-3 bg-white rounded-xl border border-indigo-100">
+            <div class="font-bold text-indigo-900 mb-1">🎮 Game Scores</div>
+            <div class="text-gray-600">Exec: <strong>${Math.round(raw.game_scores.executive * 100)}%</strong></div>
+            <div class="text-gray-600">Visuo: <strong>${Math.round(raw.game_scores.visuospatial * 100)}%</strong></div>
+            <div class="text-gray-600">Memory: <strong>${Math.round(raw.game_scores.memory * 100)}%</strong></div>
+          </div>
+          <div class="p-3 bg-white rounded-xl border border-indigo-100">
+            <div class="font-bold text-indigo-900 mb-1">👆 Touch Kinematics</div>
+            <div class="text-gray-600">Pressure: <strong>${raw.kinematics.touch_pressure}</strong></div>
+            <div class="text-gray-600">Velocity: <strong>${raw.kinematics.stroke_velocity_mm_s} mm/s</strong></div>
+            <div class="text-gray-600">Jitter: <strong>${raw.kinematics.drag_jitter_mm_ms} mm/ms</strong></div>
+            <div class="text-gray-600">Hesitation: <strong>${raw.kinematics.air_hesitation_ms} ms</strong></div>
+          </div>
+          <div class="p-3 bg-white rounded-xl border border-indigo-100">
+            <div class="font-bold text-indigo-900 mb-1">👁️ MediaPipe Oculomotor</div>
+            <div class="text-gray-600">Saccade: <strong>${raw.oculomotor.saccade_velocity_deg_s} deg/s</strong></div>
+            <div class="text-gray-600">Blinks: <strong>${raw.oculomotor.blink_frequency_per_min}/min</strong></div>
+            <div class="text-emerald-700 font-semibold mt-1">✓ Normal Fixation</div>
+          </div>
+          <div class="p-3 bg-white rounded-xl border border-indigo-100">
+            <div class="font-bold text-indigo-900 mb-1">👤 Demographics</div>
+            <div class="text-gray-600">Age: <strong>${raw.demographics.age} yrs</strong></div>
+            <div class="text-gray-600">Education Mod: <strong>${raw.demographics.education_modifier} yrs</strong></div>
+            <div class="text-purple-700 font-semibold mt-1">Model: quantized .tflite</div>
+          </div>
+        </div>
+        ` : ''}
+
+        <!-- Clinical Recommendation Footer -->
+        <div class="p-4 bg-indigo-100/70 rounded-2xl flex items-start gap-3 text-xs text-indigo-950">
+          <span class="text-lg">💡</span>
+          <div>
+            <span class="font-bold">Clinical SuStIn Rationale:</span> ${d.clinical_interpretation}
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   renderCharts() {

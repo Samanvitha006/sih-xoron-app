@@ -16,6 +16,7 @@ from pydantic import BaseModel
 
 from database import get_db_connection, init_db
 from chatbot import assistant
+from dnf_engine import calculate_dnf, evaluate_patient_dnf, normalize_features
 
 app = FastAPI(
     title="XORON - Cognitive Care in the Language of Home",
@@ -88,6 +89,12 @@ class QdrsSurveyRequest(BaseModel):
     patient_id: str = "pat-ner-001"
     score: float
     synced_to_cloud: bool = True
+
+class DnfPredictRequest(BaseModel):
+    game_scores: List[float] # Executive, Visuospatial, Memory
+    kinematics: List[float] # Pressure, stroke velocity, drag jitter, air-hesitation
+    oculomotor: List[float] # Saccade velocity, blink frequency
+    demographics: List[float] # Age, education modifier
 
 @app.on_event("startup")
 def startup_event():
@@ -409,6 +416,51 @@ def get_schedules(patient_id: str):
     schedules = [dict(r) for r in cursor.fetchall()]
     conn.close()
     return schedules
+
+# 12. SuStIn Disease Progression & Neurodegeneration Forecasting (DNF) Endpoints
+@app.get("/api/dnf/{patient_id}")
+def get_patient_dnf(patient_id: str):
+    try:
+        return evaluate_patient_dnf(patient_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/dnf/predict")
+def predict_dnf(req: DnfPredictRequest):
+    try:
+        norm_game, norm_kin, norm_oculo, norm_demo = normalize_features(
+            req.game_scores, req.kinematics, req.oculomotor, req.demographics
+        )
+        probs = calculate_dnf(norm_game, norm_kin, norm_oculo, norm_demo)
+        p_a, p_b, p_c = float(probs[0]), float(probs[1]), float(probs[2])
+        stages = [
+            "Stage A (Normal / Pre-symptomatic)",
+            "Stage B (Mild Cognitive Impairment - MCI)",
+            "Stage C (Dementia Progression)"
+        ]
+        import numpy as np
+        best_idx = int(np.argmax(probs))
+        return {
+            "status": "success",
+            "probabilities": {
+                "stage_a": round(p_a, 4),
+                "stage_b_mci": round(p_b, 4),
+                "stage_c_dementia": round(p_c, 4)
+            },
+            "probabilities_pct": {
+                "stage_a": round(p_a * 100, 1),
+                "stage_b_mci": round(p_b * 100, 1),
+                "stage_c_dementia": round(p_c * 100, 1)
+            },
+            "classified_stage": stages[best_idx],
+            "confidence_score": round(float(probs[best_idx]), 4),
+            "confidence_pct": round(float(probs[best_idx]) * 100, 1),
+            "edge_model": "sustin_dnf_model.tflite (Quantized On-Device)"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
